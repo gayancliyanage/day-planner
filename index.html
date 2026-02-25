@@ -8,7 +8,6 @@
   :root {
     --bg: #fff;
     --surface: #f7f7f7;
-    --surface2: #f0f0f0;
     --border: #e0e0e0;
     --border-light: #f0f0f0;
     --text: #000;
@@ -19,44 +18,35 @@
     --white: #fff;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 14px; -webkit-font-smoothing: antialiased; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 14px; -webkit-font-smoothing: antialiased; }
 
-  /* Sidebar */
-  .sidebar { width: 240px; min-width: 240px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .sidebar { width: 220px; min-width: 220px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
   .sidebar-header { padding: 24px 20px 16px; }
   .sidebar-header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
-
-  .today-btn { margin: 0 16px 12px; padding: 7px 0; background: var(--text); color: var(--white); border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; letter-spacing: 0.3px; }
+  .today-btn { margin: 0 16px 12px; padding: 7px 0; background: var(--text); color: var(--white); border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; }
   .today-btn:hover { background: #333; }
-
   .nav-scroll { flex: 1; overflow-y: auto; padding-bottom: 20px; }
-
-  .year-label { padding: 10px 20px 4px; font-size: 11px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
-  .month-group { }
+  .year-label { padding: 10px 20px 4px; font-size: 11px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
   .month-label { padding: 6px 20px; font-size: 12px; font-weight: 600; color: var(--text-mid); cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .month-label:hover { color: var(--text); }
   .month-label .arr { font-size: 8px; color: var(--text-faint); transition: transform 0.15s; }
   .collapsed .arr { transform: rotate(-90deg); }
   .collapsed .day-list { display: none; }
-
   .day-item { padding: 4px 20px 4px 32px; font-size: 12px; color: var(--text-dim); cursor: pointer; line-height: 1.8; }
   .day-item:hover { color: var(--text); background: var(--surface); }
   .day-item.active { color: var(--white); background: var(--text); border-radius: 4px; margin: 1px 12px; padding-left: 20px; font-weight: 500; }
   .day-item.today:not(.active) { color: var(--accent); font-weight: 600; }
   .day-item.has-plans::after { content: '·'; margin-left: 6px; color: var(--accent); font-weight: 900; font-size: 16px; line-height: 0; vertical-align: middle; }
 
-  /* Main */
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
-
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .main-header { padding: 20px 32px 12px; display: flex; align-items: baseline; justify-content: space-between; }
-  .main-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .main-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
   .header-right { display: flex; gap: 6px; align-items: center; }
   .nav-btn { background: none; border: 1px solid var(--border); color: var(--text-mid); width: 28px; height: 28px; border-radius: 5px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
-  .nav-btn:hover { background: var(--surface); color: var(--text); }
+  .nav-btn:hover { background: var(--surface); }
   .export-btn { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; }
   .export-btn:hover { background: var(--surface); color: var(--text); }
 
-  /* Summary */
   .day-summary { padding: 0 32px 14px; display: flex; gap: 16px; font-size: 11px; color: var(--text-dim); font-weight: 500; }
   .stat { display: flex; align-items: center; gap: 5px; }
   .stat-bar { width: 6px; height: 6px; border-radius: 1px; }
@@ -64,37 +54,33 @@
   .stat-bar.done { background: var(--text); }
   .stat-bar.missed { background: var(--accent); }
 
-  /* Schedule */
   .schedule { flex: 1; overflow-y: auto; padding: 0 32px 40px; }
-
   .col-headers { display: grid; grid-template-columns: 56px 1fr 1fr; border-bottom: 2px solid var(--text); padding: 6px 0; margin-bottom: 2px; position: sticky; top: 0; background: var(--bg); z-index: 5; }
   .col-headers span { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mid); }
   .col-headers span:first-child { color: var(--text-dim); }
   .col-headers span:nth-child(2) { padding-left: 12px; }
   .col-headers span:nth-child(3) { padding-left: 12px; color: var(--text-dim); }
 
-  .hour-row { display: grid; grid-template-columns: 56px 1fr 1fr; border-bottom: 1px solid var(--border-light); min-height: 44px; transition: background 0.1s; }
-  .hour-row:hover { background: var(--surface); }
-  .hour-row.current { background: rgba(196, 107, 46, 0.04); }
+  .slot-row { display: grid; grid-template-columns: 56px 1fr 1fr; min-height: 36px; transition: background 0.1s; }
+  .slot-row:hover { background: var(--surface); }
+  .slot-row.current { background: rgba(196, 107, 46, 0.04); }
+  .slot-row.hour-start { border-top: 1px solid var(--border); }
+  .slot-row.half-hour { border-top: 1px solid var(--border-light); }
 
-  .hour-time { padding: 10px 8px 10px 0; font-size: 11px; font-weight: 500; color: var(--text-faint); text-align: right; font-variant-numeric: tabular-nums; }
-  .hour-row.current .hour-time { color: var(--accent); font-weight: 700; }
+  .slot-time { padding: 8px 8px 8px 0; font-size: 11px; font-weight: 500; color: var(--text-faint); text-align: right; font-variant-numeric: tabular-nums; }
+  .slot-row.half-hour .slot-time { font-size: 10px; color: var(--border); }
+  .slot-row.current .slot-time { color: var(--accent); font-weight: 700; }
 
-  .hour-cell { padding: 8px 12px; border-left: 1px solid var(--border-light); }
-  .hour-cell.plan-cell { }
-  .hour-cell.actual-cell { }
-
-  .cell-input { width: 100%; min-height: 24px; padding: 2px 4px; font-size: 13px; line-height: 1.5; color: var(--text); border: none; background: transparent; resize: none; font-family: inherit; outline: none; border-radius: 3px; }
-  .cell-input:focus { background: var(--white); box-shadow: 0 0 0 1px var(--border); }
+  .slot-cell { padding: 6px 10px; border-left: 1px solid var(--border-light); }
+  .cell-input { width: 100%; min-height: 20px; padding: 2px 4px; font-size: 12px; line-height: 1.5; color: var(--text); border: none; background: transparent; resize: none; font-family: inherit; outline: none; border-radius: 3px; }
+  .cell-input:focus { background: var(--surface); box-shadow: 0 0 0 1px var(--border); }
   .cell-input::placeholder { color: var(--text-faint); font-style: normal; }
   .actual-cell .cell-input { color: var(--text-mid); }
   .actual-cell .cell-input::placeholder { color: var(--border); }
 
-  /* Save toast */
   .toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--white); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
   .toast.show { opacity: 1; }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -110,9 +96,7 @@
 <body>
 
 <div class="sidebar">
-  <div class="sidebar-header">
-    <h1>Day Planner</h1>
-  </div>
+  <div class="sidebar-header"><h1>Day Planner</h1></div>
   <button class="today-btn" onclick="goToday()">Today</button>
   <div class="nav-scroll" id="sidebar-nav"></div>
 </div>
@@ -128,18 +112,14 @@
   </div>
   <div class="day-summary" id="summary"></div>
   <div class="schedule">
-    <div class="col-headers">
-      <span></span>
-      <span>Plan</span>
-      <span>Actual</span>
-    </div>
+    <div class="col-headers"><span></span><span>Plan</span><span>Actual</span></div>
     <div id="grid"></div>
   </div>
 </div>
 
 <div class="toast" id="toast">Saved</div>
 <script>
-const STORE = 'dp_v5';
+const STORE = 'dp_v6';
 let cur = new Date();
 let data = {};
 
@@ -152,27 +132,24 @@ function save() {
 
 function dk(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function gd(k) { if (!data[k]) data[k] = {}; return data[k]; }
+function slotKey(h, m) { return `${String(h).padStart(2,'0')}:${m === 0 ? '00' : '30'}`; }
 
-function set(k, h, f, v) { const d = gd(k); if (!d[h]) d[h] = { p: '', a: '' }; d[h][f] = v; save(); }
+function set(k, sk, f, v) { const d = gd(k); if (!d[sk]) d[sk] = { p: '', a: '' }; d[sk][f] = v; save(); }
 
-// Sidebar
 function renderNav() {
   const nav = document.getElementById('sidebar-nav');
   const y = cur.getFullYear();
   const ck = dk(cur);
   const tk = dk(new Date());
-  const mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mf = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   let h = `<div class="year-label">${y}</div>`;
-
   for (let m = 0; m < 12; m++) {
     const isCur = m === cur.getMonth();
-    const mf = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     h += `<div class="month-group ${isCur ? '' : 'collapsed'}" id="mg-${m}">
       <div class="month-label" onclick="document.getElementById('mg-${m}').classList.toggle('collapsed')">
-        <span class="arr">▼</span>${mf[m]}
-      </div><div class="day-list">`;
+        <span class="arr">▼</span>${mf[m]}</div><div class="day-list">`;
     const days = new Date(y, m+1, 0).getDate();
-    const dn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     for (let d = 1; d <= days; d++) {
       const dt = new Date(y, m, d);
       const key = dk(dt);
@@ -186,13 +163,13 @@ function renderNav() {
   nav.innerHTML = h;
 }
 
-// Grid
 function renderGrid() {
   const key = dk(cur);
   const dd = gd(key);
   const now = new Date();
   const isToday = dk(now) === key;
-  const ch = now.getHours();
+  const curH = now.getHours();
+  const curM = now.getMinutes();
   const dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const mn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -200,30 +177,34 @@ function renderGrid() {
 
   let html = '';
   for (let h = 5; h <= 23; h++) {
-    const hr = dd[h] || { p: '', a: '' };
-    const isCur = isToday && h === ch;
-    html += `<div class="hour-row${isCur ? ' current' : ''}" id="hr-${h}">
-      <div class="hour-time">${String(h).padStart(2,'0')}:00</div>
-      <div class="hour-cell plan-cell">
-        <textarea class="cell-input" placeholder="—" rows="1"
-          oninput="autoH(this);edit('${key}',${h},'p',this.value)"
-          onblur="edit('${key}',${h},'p',this.value)">${esc(hr.p)}</textarea>
-      </div>
-      <div class="hour-cell actual-cell">
-        <textarea class="cell-input" placeholder="—" rows="1"
-          oninput="autoH(this);edit('${key}',${h},'a',this.value)"
-          onblur="edit('${key}',${h},'a',this.value)">${esc(hr.a)}</textarea>
-      </div>
-    </div>`;
+    for (let m = 0; m <= 30; m += 30) {
+      const sk = slotKey(h, m);
+      const sr = dd[sk] || { p: '', a: '' };
+      const isHourStart = m === 0;
+      const isCurrent = isToday && h === curH && ((m === 0 && curM < 30) || (m === 30 && curM >= 30));
+      const rowClass = `slot-row${isHourStart ? ' hour-start' : ' half-hour'}${isCurrent ? ' current' : ''}`;
+      const timeLabel = `${String(h).padStart(2,'0')}:${m === 0 ? '00' : '30'}`;
+
+      html += `<div class="${rowClass}" id="sr-${h}-${m}">
+        <div class="slot-time">${timeLabel}</div>
+        <div class="slot-cell plan-cell">
+          <textarea class="cell-input" placeholder="—" rows="1"
+            oninput="autoH(this);edit('${key}','${sk}','p',this.value)"
+            onblur="edit('${key}','${sk}','p',this.value)">${esc(sr.p)}</textarea>
+        </div>
+        <div class="slot-cell actual-cell">
+          <textarea class="cell-input" placeholder="—" rows="1"
+            oninput="autoH(this);edit('${key}','${sk}','a',this.value)"
+            onblur="edit('${key}','${sk}','a',this.value)">${esc(sr.a)}</textarea>
+        </div>
+      </div>`;
+    }
   }
   document.getElementById('grid').innerHTML = html;
-
-  // Auto-height all textareas
   document.querySelectorAll('.cell-input').forEach(autoH);
 
-  // Scroll to current
   if (isToday) setTimeout(() => {
-    const el = document.getElementById(`hr-${ch}`);
+    const el = document.getElementById(`sr-${curH}-${curM < 30 ? 0 : 30}`);
     if (el) el.scrollIntoView({ block: 'center' });
   }, 50);
 
@@ -234,20 +215,22 @@ function autoH(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 let st;
-function edit(k, h, f, v) { clearTimeout(st); st = setTimeout(() => { set(k, h, f, v); updateSummary(k); }, 400); }
+function edit(k, sk, f, v) { clearTimeout(st); st = setTimeout(() => { set(k, sk, f, v); updateSummary(k); }, 400); }
 
 function updateSummary(k) {
   const dd = gd(k);
   let planned=0, done=0, missed=0;
   const now = new Date();
-  for (let h = 5; h <= 23; h++) {
-    const hr = dd[h] || {};
-    if (hr.p && hr.p.trim()) {
-      if (hr.a && hr.a.trim()) done++;
-      else if (dk(now)===k && h<=now.getHours()) missed++;
-      else planned++;
+  Object.entries(dd).forEach(([sk, v]) => {
+    if (v.p && v.p.trim()) {
+      if (v.a && v.a.trim()) done++;
+      else {
+        const [h,m] = sk.split(':').map(Number);
+        if (dk(now)===k && (h < now.getHours() || (h === now.getHours() && m <= now.getMinutes()))) missed++;
+        else planned++;
+      }
     }
-  }
+  });
   document.getElementById('summary').innerHTML =
     `<div class="stat"><div class="stat-bar planned"></div>${planned} planned</div>
      <div class="stat"><div class="stat-bar done"></div>${done} done</div>
@@ -264,8 +247,11 @@ function exportMD() {
   const dd = gd(k);
   let md = `# ${k}\n\n| Time | Plan | Actual |\n|------|------|--------|\n`;
   for (let h = 5; h <= 23; h++) {
-    const hr = dd[h] || {};
-    md += `| ${String(h).padStart(2,'0')}:00 | ${(hr.p||'—').replace(/\n/g,' ')} | ${(hr.a||'—').replace(/\n/g,' ')} |\n`;
+    for (let m = 0; m <= 30; m += 30) {
+      const sk = slotKey(h, m);
+      const sr = dd[sk] || {};
+      md += `| ${sk} | ${(sr.p||'—').replace(/\n/g,' ')} | ${(sr.a||'—').replace(/\n/g,' ')} |\n`;
+    }
   }
   navigator.clipboard.writeText(md);
   const t = document.getElementById('toast'); t.textContent='Copied'; t.classList.add('show');
@@ -282,29 +268,44 @@ document.addEventListener('keydown', e => {
 // Init
 load();
 
-// Seed today
 const tk = dk(new Date());
-if (!data[tk] || !Object.values(data[tk]).some(v=>v.p)) {
+if (!data[tk] || Object.keys(data[tk]).length === 0) {
   const s = {
-    7: { p: '🏋️ Gym', a: '' },
-    8: { p: 'Get ready + breakfast', a: '' },
-    9: { p: '📞 Ventaz & Craftit — sales & marketing (9:30-12:00)', a: '' },
-    10: { p: '📞 Ventaz & Craftit — sales & marketing', a: '' },
-    11: { p: '📞 Ventaz & Craftit — sales & marketing', a: '' },
-    12: { p: 'Lunch (12:00-12:30) → Backend Chapter Meeting (12:30-1:30)', a: '' },
-    13: { p: 'Backend Chapter Meeting (till 1:30) → Leave for errands', a: '' },
-    14: { p: '🎁 Pick up printed photos + Get gift for Andy (1:30-2:30)', a: '' },
-    15: { p: 'PMO Task Tracking meeting (3:00-3:30) → Day job', a: '' },
-    16: { p: 'Day job', a: '' },
-    17: { p: 'Day job', a: '' },
-    18: { p: '📖 Rylie study — P3 weighted assessments', a: '' },
-    19: { p: 'Dinner + family', a: '' },
-    20: { p: '📞 Ventaz Sales — outreach (15 DMs)', a: '' },
-    21: { p: '📞 Ventaz Sales — follow-ups + demos', a: '' },
-    22: { p: '📞 Ventaz Sales — close + update CRM', a: '' },
-    23: { p: 'Wind down + plan tomorrow', a: '' },
+    '07:00': { p: '🏋️ Gym', a: '' },
+    '07:30': { p: '🏋️ Gym', a: '' },
+    '08:00': { p: 'Get ready', a: '' },
+    '08:30': { p: 'Breakfast', a: '' },
+    '09:00': { p: 'Prep — review prospect list', a: '' },
+    '09:30': { p: '📞 Ventaz & Craftit — send 10 LinkedIn DMs', a: '' },
+    '10:00': { p: '📞 Ventaz & Craftit — send 5 cold emails', a: '' },
+    '10:30': { p: '📞 Ventaz & Craftit — post LinkedIn content', a: '' },
+    '11:00': { p: '📞 Ventaz & Craftit — follow up on leads', a: '' },
+    '11:30': { p: '📞 Ventaz & Craftit — update CRM + prep demos', a: '' },
+    '12:00': { p: 'Lunch', a: '' },
+    '12:30': { p: 'Backend Chapter Meeting', a: '' },
+    '13:00': { p: 'Backend Chapter Meeting (till 1:30)', a: '' },
+    '13:30': { p: '🎁 Pick up printed photos + gift for Andy', a: '' },
+    '14:00': { p: '🎁 Errands continued → head home', a: '' },
+    '14:30': { p: 'Back home — Day job', a: '' },
+    '15:00': { p: 'PMO Task Tracking meeting (3:00-3:30)', a: '' },
+    '15:30': { p: 'Day job', a: '' },
+    '16:00': { p: 'Day job', a: '' },
+    '16:30': { p: 'Day job', a: '' },
+    '17:00': { p: 'Day job', a: '' },
+    '17:30': { p: 'Wrap up day job', a: '' },
+    '18:00': { p: '📖 Rylie study — P3 weighted assessments', a: '' },
+    '18:30': { p: '📖 Rylie study', a: '' },
+    '19:00': { p: 'Dinner', a: '' },
+    '19:30': { p: 'Family time', a: '' },
+    '20:00': { p: '📞 Ventaz Sales — outreach (10 DMs)', a: '' },
+    '20:30': { p: '📞 Ventaz Sales — follow-ups', a: '' },
+    '21:00': { p: '📞 Ventaz Sales — demo calls', a: '' },
+    '21:30': { p: '📞 Ventaz Sales — engage on LinkedIn', a: '' },
+    '22:00': { p: '📞 Ventaz Sales — update CRM + pipeline', a: '' },
+    '22:30': { p: 'Review day — fill in Actual column', a: '' },
+    '23:00': { p: 'Wind down + plan tomorrow', a: '' },
   };
-  Object.entries(s).forEach(([h,v]) => { if(!gd(tk)[h]) gd(tk)[h] = v; });
+  data[tk] = s;
   save();
 }
 
