@@ -3,507 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day Planner — Gayan</title>
+<title>Day Planner</title>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a25;
-    --border: #2a2a3a;
-    --text: #e0e0e8;
-    --text-dim: #888899;
-    --accent: #6366f1;
-    --accent-light: #818cf8;
-    --green: #22c55e;
-    --orange: #f59e0b;
-    --red: #ef4444;
-    --blue: #3b82f6;
+    --bg: #fafafa;
+    --surface: #f0f0f0;
+    --surface2: #e8e8e8;
+    --border: #d4d4d4;
+    --border-light: #eaeaea;
+    --text: #1a1a1a;
+    --text-mid: #555;
+    --text-dim: #999;
+    --text-faint: #bbb;
+    --accent: #c46b2e;
+    --white: #fff;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+  body { font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 14px; -webkit-font-smoothing: antialiased; }
 
-  /* Left Panel */
-  .sidebar { width: 280px; min-width: 280px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
-  .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
-  .sidebar-header h1 { font-size: 18px; font-weight: 700; }
-  .sidebar-header p { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  /* Sidebar */
+  .sidebar { width: 240px; min-width: 240px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .sidebar-header { padding: 24px 20px 16px; }
+  .sidebar-header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
 
-  .year-group { border-bottom: 1px solid var(--border); }
-  .year-label, .month-label, .day-item {
-    padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; transition: background 0.15s;
-  }
-  .year-label { font-weight: 700; font-size: 14px; padding: 12px 16px; background: var(--surface2); }
-  .year-label:hover, .month-label:hover { background: var(--surface2); }
-  .month-label { padding-left: 28px; font-weight: 600; color: var(--accent-light); }
-  .day-item { padding-left: 44px; color: var(--text-dim); font-size: 12px; }
-  .day-item:hover { background: var(--surface2); color: var(--text); }
-  .day-item.active { background: var(--accent); color: white; border-radius: 4px; margin: 2px 8px; padding-left: 36px; }
-  .day-item.today { font-weight: 700; color: var(--accent-light); }
-  .day-item.has-plans::after { content: '•'; color: var(--green); margin-left: auto; font-size: 16px; }
-  .collapse-icon { font-size: 10px; transition: transform 0.2s; }
-  .collapsed .collapse-icon { transform: rotate(-90deg); }
-  .collapsed .month-list, .collapsed .day-list { display: none; }
+  .today-btn { margin: 0 16px 12px; padding: 7px 0; background: var(--text); color: var(--white); border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; letter-spacing: 0.3px; }
+  .today-btn:hover { background: #333; }
 
-  .today-btn { margin: 12px 16px; padding: 8px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
-  .today-btn:hover { background: var(--accent-light); }
+  .nav-scroll { flex: 1; overflow-y: auto; padding-bottom: 20px; }
 
-  /* Main Content */
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .main-header { padding: 20px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .main-header h2 { font-size: 22px; font-weight: 700; }
-  .main-header .date-nav { display: flex; gap: 8px; align-items: center; }
-  .main-header .date-nav button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  .main-header .date-nav button:hover { background: var(--border); }
+  .year-label { padding: 10px 20px 4px; font-size: 11px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+  .month-group { }
+  .month-label { padding: 6px 20px; font-size: 12px; font-weight: 600; color: var(--text-mid); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .month-label:hover { color: var(--text); }
+  .month-label .arr { font-size: 8px; color: var(--text-faint); transition: transform 0.15s; }
+  .collapsed .arr { transform: rotate(-90deg); }
+  .collapsed .day-list { display: none; }
 
-  .day-summary { padding: 12px 28px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 20px; font-size: 12px; }
-  .stat { display: flex; align-items: center; gap: 6px; }
-  .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .stat-dot.planned { background: var(--blue); }
-  .stat-dot.done { background: var(--green); }
-  .stat-dot.missed { background: var(--red); }
-  .stat-dot.free { background: var(--border); }
+  .day-item { padding: 4px 20px 4px 32px; font-size: 12px; color: var(--text-dim); cursor: pointer; line-height: 1.8; }
+  .day-item:hover { color: var(--text); background: var(--surface); }
+  .day-item.active { color: var(--white); background: var(--text); border-radius: 4px; margin: 1px 12px; padding-left: 20px; font-weight: 500; }
+  .day-item.today:not(.active) { color: var(--accent); font-weight: 600; }
+  .day-item.has-plans::after { content: '·'; margin-left: 6px; color: var(--accent); font-weight: 900; font-size: 16px; line-height: 0; vertical-align: middle; }
 
-  .schedule { flex: 1; overflow-y: auto; padding: 16px 28px; }
-  .hour-block { display: grid; grid-template-columns: 70px 1fr 1fr; gap: 0; border-bottom: 1px solid var(--border); min-height: 60px; }
-  .hour-block:hover { background: rgba(99, 102, 241, 0.03); }
-  .hour-time { padding: 10px 8px; font-size: 12px; font-weight: 600; color: var(--text-dim); border-right: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: center; }
-  .hour-time.current-hour { color: var(--accent); }
+  /* Main */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
-  .hour-plan, .hour-actual { padding: 8px 12px; position: relative; }
-  .hour-plan { border-right: 1px solid var(--border); }
-  .column-header { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 4px; font-weight: 600; }
-  .hour-plan .column-header { color: var(--blue); }
-  .hour-actual .column-header { color: var(--green); }
+  .main-header { padding: 20px 32px 12px; display: flex; align-items: baseline; justify-content: space-between; }
+  .main-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .header-right { display: flex; gap: 6px; align-items: center; }
+  .nav-btn { background: none; border: 1px solid var(--border); color: var(--text-mid); width: 28px; height: 28px; border-radius: 5px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { background: var(--surface); color: var(--text); }
+  .export-btn { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; }
+  .export-btn:hover { background: var(--surface); color: var(--text); }
 
-  .hour-content { min-height: 32px; padding: 4px 6px; border-radius: 4px; font-size: 13px; line-height: 1.5; cursor: text; white-space: pre-wrap; word-break: break-word; }
-  .hour-content:hover { background: var(--surface2); }
-  .hour-content:focus { background: var(--surface2); outline: 1px solid var(--accent); outline-offset: 1px; }
-  .hour-content:empty::before { content: attr(data-placeholder); color: var(--text-dim); opacity: 0.4; font-style: italic; }
+  /* Summary */
+  .day-summary { padding: 0 32px 14px; display: flex; gap: 16px; font-size: 11px; color: var(--text-dim); font-weight: 500; }
+  .stat { display: flex; align-items: center; gap: 5px; }
+  .stat-bar { width: 6px; height: 6px; border-radius: 1px; }
+  .stat-bar.planned { background: var(--text-dim); }
+  .stat-bar.done { background: var(--text); }
+  .stat-bar.missed { background: var(--accent); }
 
-  .hour-content .tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-right: 4px; }
-  .tag-work { background: rgba(99, 102, 241, 0.2); color: var(--accent-light); }
-  .tag-health { background: rgba(34, 197, 94, 0.2); color: var(--green); }
-  .tag-family { background: rgba(245, 158, 11, 0.2); color: var(--orange); }
-  .tag-sales { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+  /* Schedule */
+  .schedule { flex: 1; overflow-y: auto; padding: 0 32px 40px; }
 
-  /* Priority markers */
-  .priority-high { border-left: 3px solid var(--red); }
-  .priority-med { border-left: 3px solid var(--orange); }
-  .priority-low { border-left: 3px solid var(--blue); }
+  .col-headers { display: grid; grid-template-columns: 56px 1fr 1fr; border-bottom: 2px solid var(--text); padding: 6px 0; margin-bottom: 2px; position: sticky; top: 0; background: var(--bg); z-index: 5; }
+  .col-headers span { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mid); }
+  .col-headers span:first-child { color: var(--text-dim); }
+  .col-headers span:nth-child(2) { padding-left: 12px; }
+  .col-headers span:nth-child(3) { padding-left: 12px; color: var(--text-dim); }
 
-  /* Status indicators */
-  .status-done .hour-plan { opacity: 0.5; }
-  .status-done .hour-actual { background: rgba(34, 197, 94, 0.05); }
+  .hour-row { display: grid; grid-template-columns: 56px 1fr 1fr; border-bottom: 1px solid var(--border-light); min-height: 44px; transition: background 0.1s; }
+  .hour-row:hover { background: var(--surface); }
+  .hour-row.current { background: rgba(196, 107, 46, 0.04); }
 
-  /* Markdown rendering */
-  .hour-content strong { font-weight: 700; color: var(--accent-light); }
-  .hour-content em { font-style: italic; color: var(--text-dim); }
-  .hour-content code { background: var(--surface2); padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+  .hour-time { padding: 10px 8px 10px 0; font-size: 11px; font-weight: 500; color: var(--text-faint); text-align: right; font-variant-numeric: tabular-nums; }
+  .hour-row.current .hour-time { color: var(--accent); font-weight: 700; }
 
-  /* Column headers row */
-  .schedule-header { display: grid; grid-template-columns: 70px 1fr 1fr; gap: 0; border-bottom: 2px solid var(--border); padding: 8px 0; position: sticky; top: 0; background: var(--bg); z-index: 5; }
-  .schedule-header div { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 700; text-align: center; }
+  .hour-cell { padding: 8px 12px; border-left: 1px solid var(--border-light); }
+  .hour-cell.plan-cell { }
+  .hour-cell.actual-cell { }
+
+  .cell-input { width: 100%; min-height: 24px; padding: 2px 4px; font-size: 13px; line-height: 1.5; color: var(--text); border: none; background: transparent; resize: none; font-family: inherit; outline: none; border-radius: 3px; }
+  .cell-input:focus { background: var(--white); box-shadow: 0 0 0 1px var(--border); }
+  .cell-input::placeholder { color: var(--text-faint); font-style: normal; }
+  .actual-cell .cell-input { color: var(--text-mid); }
+  .actual-cell .cell-input::placeholder { color: var(--border); }
+
+  /* Save toast */
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--white); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
 
   /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* Save indicator */
-  .save-indicator { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #000; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 100; }
-  .save-indicator.show { opacity: 1; }
-
-  /* Export button */
-  .export-btn { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-  .export-btn:hover { background: var(--surface2); color: var(--text); }
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .schedule { padding: 0 16px 40px; }
+    .main-header { padding: 16px 16px 10px; }
+    .day-summary { padding: 0 16px 10px; }
+  }
 </style>
 </head>
 <body>
 
 <div class="sidebar">
   <div class="sidebar-header">
-    <h1>📅 Day Planner</h1>
-    <p>Plan → Execute → Review</p>
+    <h1>Day Planner</h1>
   </div>
-  <button class="today-btn" onclick="goToday()">⚡ Today</button>
-  <div id="sidebar-nav"></div>
+  <button class="today-btn" onclick="goToday()">Today</button>
+  <div class="nav-scroll" id="sidebar-nav"></div>
 </div>
 
 <div class="main">
   <div class="main-header">
-    <div class="date-nav">
-      <button onclick="prevDay()">←</button>
-      <h2 id="current-date-title"></h2>
-      <button onclick="nextDay()">→</button>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button class="export-btn" onclick="exportDay()">📋 Export MD</button>
-      <button class="export-btn" onclick="exportJSON()">💾 Export Data</button>
-      <button class="export-btn" onclick="importJSON()">📥 Import</button>
+    <h2 id="title"></h2>
+    <div class="header-right">
+      <button class="nav-btn" onclick="prevDay()">‹</button>
+      <button class="nav-btn" onclick="nextDay()">›</button>
+      <button class="export-btn" onclick="exportMD()">Export</button>
     </div>
   </div>
-
-  <div class="day-summary" id="day-summary"></div>
-
+  <div class="day-summary" id="summary"></div>
   <div class="schedule">
-    <div class="schedule-header">
-      <div>Time</div>
-      <div style="color:var(--blue)">📋 Plan</div>
-      <div style="color:var(--green)">✅ Actual</div>
+    <div class="col-headers">
+      <span></span>
+      <span>Plan</span>
+      <span>Actual</span>
     </div>
-    <div id="schedule-body"></div>
+    <div id="grid"></div>
   </div>
 </div>
 
-<div class="save-indicator" id="save-indicator">✅ Saved</div>
-<input type="file" id="import-input" accept=".json" style="display:none">
-
+<div class="toast" id="toast">Saved</div>
 <script>
-// State
-let currentDate = new Date();
+const STORE = 'dp_v2';
+let cur = new Date();
 let data = {};
-const STORAGE_KEY = 'dayplanner_data';
 
-// Load data
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) data = JSON.parse(saved);
-  } catch(e) { data = {}; }
+function load() { try { data = JSON.parse(localStorage.getItem(STORE) || '{}'); } catch(e) { data = {}; } }
+function save() {
+  localStorage.setItem(STORE, JSON.stringify(data));
+  const t = document.getElementById('toast'); t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1200);
 }
 
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  const el = document.getElementById('save-indicator');
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 1500);
-}
+function dk(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function gd(k) { if (!data[k]) data[k] = {}; return data[k]; }
 
-function dateKey(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
+function set(k, h, f, v) { const d = gd(k); if (!d[h]) d[h] = { p: '', a: '' }; d[h][f] = v; save(); }
 
-function getDayData(key) {
-  if (!data[key]) data[key] = { hours: {} };
-  return data[key];
-}
-
-function setHourData(key, hour, field, value) {
-  const day = getDayData(key);
-  if (!day.hours[hour]) day.hours[hour] = { plan: '', actual: '' };
-  day.hours[hour][field] = value;
-  saveData();
-}
-
-// Render sidebar
-function renderSidebar() {
+// Sidebar
+function renderNav() {
   const nav = document.getElementById('sidebar-nav');
-  const today = new Date();
-  const currentKey = dateKey(currentDate);
+  const y = cur.getFullYear();
+  const ck = dk(cur);
+  const tk = dk(new Date());
+  const mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let h = `<div class="year-label">${y}</div>`;
 
-  // Show current year and surrounding months
-  const year = currentDate.getFullYear();
-  const months = [];
   for (let m = 0; m < 12; m++) {
-    months.push(m);
-  }
-
-  let html = `<div class="year-group" id="year-${year}">
-    <div class="year-label" onclick="toggleCollapse('year-${year}')">
-      <span class="collapse-icon">▼</span> ${year}
-    </div>
-    <div class="month-list">`;
-
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-  months.forEach(m => {
-    const monthId = `month-${year}-${m}`;
-    const isCurrentMonth = (m === currentDate.getMonth());
-    const collapsed = !isCurrentMonth ? 'collapsed' : '';
-
-    html += `<div class="month-group ${collapsed}" id="${monthId}">
-      <div class="month-label" onclick="toggleCollapse('${monthId}')">
-        <span class="collapse-icon">▼</span> ${monthNames[m]}
-      </div>
-      <div class="day-list">`;
-
-    const daysInMonth = new Date(year, m + 1, 0).getDate();
-    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dt = new Date(year, m, d);
-      const key = dateKey(dt);
-      const isToday = key === dateKey(today);
-      const isActive = key === currentKey;
-      const hasPlans = data[key] && Object.values(data[key].hours || {}).some(h => h.plan || h.actual);
-
-      let classes = 'day-item';
-      if (isActive) classes += ' active';
-      if (isToday) classes += ' today';
-      if (hasPlans) classes += ' has-plans';
-
-      html += `<div class="${classes}" onclick="goToDate('${key}')">
-        ${dayNames[dt.getDay()]} ${d}
-      </div>`;
+    const isCur = m === cur.getMonth();
+    const mf = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    h += `<div class="month-group ${isCur ? '' : 'collapsed'}" id="mg-${m}">
+      <div class="month-label" onclick="document.getElementById('mg-${m}').classList.toggle('collapsed')">
+        <span class="arr">▼</span>${mf[m]}
+      </div><div class="day-list">`;
+    const days = new Date(y, m+1, 0).getDate();
+    const dn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    for (let d = 1; d <= days; d++) {
+      const dt = new Date(y, m, d);
+      const key = dk(dt);
+      const active = key === ck ? ' active' : '';
+      const today = key === tk ? ' today' : '';
+      const has = data[key] && Object.values(data[key]).some(v => v.p || v.a) ? ' has-plans' : '';
+      h += `<div class="day-item${active}${today}${has}" onclick="go('${key}')">${dn[dt.getDay()]} ${d}</div>`;
     }
-
-    html += `</div></div>`;
-  });
-
-  html += `</div></div>`;
-  nav.innerHTML = html;
+    h += '</div></div>';
+  }
+  nav.innerHTML = h;
 }
 
-function toggleCollapse(id) {
-  document.getElementById(id).classList.toggle('collapsed');
-}
+// Grid
+function renderGrid() {
+  const key = dk(cur);
+  const dd = gd(key);
+  const now = new Date();
+  const isToday = dk(now) === key;
+  const ch = now.getHours();
+  const dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const mn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-// Render schedule
-function renderSchedule() {
-  const key = dateKey(currentDate);
-  const dayData = getDayData(key);
-  const today = new Date();
-  const isToday = dateKey(today) === key;
-  const currentHour = today.getHours();
+  document.getElementById('title').textContent = `${dn[cur.getDay()]}, ${cur.getDate()} ${mn[cur.getMonth()]}`;
 
-  // Title
-  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('current-date-title').textContent =
-    `${days[currentDate.getDay()]}, ${currentDate.getDate()} ${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-
-  // Schedule body
-  const body = document.getElementById('schedule-body');
   let html = '';
-
   for (let h = 5; h <= 23; h++) {
-    const hourStr = `${String(h).padStart(2,'0')}:00`;
-    const hourData = dayData.hours[h] || { plan: '', actual: '' };
-    const isCurrentHour = isToday && h === currentHour;
-    const hasPlan = hourData.plan && hourData.plan.trim();
-    const hasActual = hourData.actual && hourData.actual.trim();
-
-    let blockClass = 'hour-block';
-    if (hasActual) blockClass += ' status-done';
-
-    html += `<div class="${blockClass}" id="hour-${h}">
-      <div class="hour-time ${isCurrentHour ? 'current-hour' : ''}">${hourStr}</div>
-      <div class="hour-plan">
-        <div class="hour-content" contenteditable="true"
-          data-placeholder="Plan..."
-          data-hour="${h}" data-field="plan"
-          oninput="onEdit(this)"
-          onblur="onBlur(this)">${escapeHtml(hourData.plan)}</div>
+    const hr = dd[h] || { p: '', a: '' };
+    const isCur = isToday && h === ch;
+    html += `<div class="hour-row${isCur ? ' current' : ''}" id="hr-${h}">
+      <div class="hour-time">${String(h).padStart(2,'0')}:00</div>
+      <div class="hour-cell plan-cell">
+        <textarea class="cell-input" placeholder="—" rows="1"
+          oninput="autoH(this);edit('${key}',${h},'p',this.value)"
+          onblur="edit('${key}',${h},'p',this.value)">${esc(hr.p)}</textarea>
       </div>
-      <div class="hour-actual">
-        <div class="hour-content" contenteditable="true"
-          data-placeholder="What actually happened..."
-          data-hour="${h}" data-field="actual"
-          oninput="onEdit(this)"
-          onblur="onBlur(this)">${escapeHtml(hourData.actual)}</div>
+      <div class="hour-cell actual-cell">
+        <textarea class="cell-input" placeholder="—" rows="1"
+          oninput="autoH(this);edit('${key}',${h},'a',this.value)"
+          onblur="edit('${key}',${h},'a',this.value)">${esc(hr.a)}</textarea>
       </div>
     </div>`;
   }
+  document.getElementById('grid').innerHTML = html;
 
-  body.innerHTML = html;
+  // Auto-height all textareas
+  document.querySelectorAll('.cell-input').forEach(autoH);
 
-  // Scroll to current hour
-  if (isToday) {
-    setTimeout(() => {
-      const el = document.getElementById(`hour-${currentHour}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-  }
+  // Scroll to current
+  if (isToday) setTimeout(() => {
+    const el = document.getElementById(`hr-${ch}`);
+    if (el) el.scrollIntoView({ block: 'center' });
+  }, 50);
 
-  // Update summary
   updateSummary(key);
 }
 
-function updateSummary(key) {
-  const dayData = getDayData(key);
-  let planned = 0, done = 0, missed = 0, free = 0;
+function autoH(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+let st;
+function edit(k, h, f, v) { clearTimeout(st); st = setTimeout(() => { set(k, h, f, v); updateSummary(k); }, 400); }
+
+function updateSummary(k) {
+  const dd = gd(k);
+  let planned=0, done=0, missed=0;
+  const now = new Date();
   for (let h = 5; h <= 23; h++) {
-    const hourData = dayData.hours[h] || {};
-    const hasPlan = hourData.plan && hourData.plan.trim();
-    const hasActual = hourData.actual && hourData.actual.trim();
-
-    if (hasPlan && hasActual) done++;
-    else if (hasPlan && !hasActual) {
-      const now = new Date();
-      if (dateKey(now) === key && h <= now.getHours()) missed++;
+    const hr = dd[h] || {};
+    if (hr.p && hr.p.trim()) {
+      if (hr.a && hr.a.trim()) done++;
+      else if (dk(now)===k && h<=now.getHours()) missed++;
       else planned++;
     }
-    else free++;
   }
-
-  document.getElementById('day-summary').innerHTML = `
-    <div class="stat"><div class="stat-dot planned"></div> Planned: ${planned}</div>
-    <div class="stat"><div class="stat-dot done"></div> Done: ${done}</div>
-    <div class="stat"><div class="stat-dot missed"></div> Missed: ${missed}</div>
-    <div class="stat"><div class="stat-dot free"></div> Free: ${free}</div>
-  `;
+  document.getElementById('summary').innerHTML =
+    `<div class="stat"><div class="stat-bar planned"></div>${planned} planned</div>
+     <div class="stat"><div class="stat-bar done"></div>${done} done</div>
+     ${missed ? `<div class="stat"><div class="stat-bar missed"></div>${missed} missed</div>` : ''}`;
 }
 
-function escapeHtml(text) {
-  if (!text) return '';
-  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function goToday() { cur = new Date(); renderNav(); renderGrid(); }
+function go(k) { const p = k.split('-'); cur = new Date(+p[0], +p[1]-1, +p[2]); renderNav(); renderGrid(); }
+function prevDay() { cur.setDate(cur.getDate()-1); renderNav(); renderGrid(); }
+function nextDay() { cur.setDate(cur.getDate()+1); renderNav(); renderGrid(); }
 
-let saveTimeout;
-function onEdit(el) {
-  clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    const hour = parseInt(el.dataset.hour);
-    const field = el.dataset.field;
-    const key = dateKey(currentDate);
-    setHourData(key, hour, field, el.textContent);
-    updateSummary(key);
-  }, 500);
-}
-
-function onBlur(el) {
-  const hour = parseInt(el.dataset.hour);
-  const field = el.dataset.field;
-  const key = dateKey(currentDate);
-  setHourData(key, hour, field, el.textContent);
-  updateSummary(key);
-}
-
-// Navigation
-function goToday() {
-  currentDate = new Date();
-  renderSidebar();
-  renderSchedule();
-}
-
-function goToDate(key) {
-  const parts = key.split('-');
-  currentDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-  renderSidebar();
-  renderSchedule();
-}
-
-function prevDay() {
-  currentDate.setDate(currentDate.getDate() - 1);
-  renderSidebar();
-  renderSchedule();
-}
-
-function nextDay() {
-  currentDate.setDate(currentDate.getDate() + 1);
-  renderSidebar();
-  renderSchedule();
-}
-
-// Export
-function exportDay() {
-  const key = dateKey(currentDate);
-  const dayData = getDayData(key);
-  let md = `# ${key}\n\n| Time | Plan | Actual |\n|------|------|--------|\n`;
-
+function exportMD() {
+  const k = dk(cur);
+  const dd = gd(k);
+  let md = `# ${k}\n\n| Time | Plan | Actual |\n|------|------|--------|\n`;
   for (let h = 5; h <= 23; h++) {
-    const hourData = dayData.hours[h] || {};
-    const plan = (hourData.plan || '-').replace(/\n/g, ' ');
-    const actual = (hourData.actual || '-').replace(/\n/g, ' ');
-    md += `| ${String(h).padStart(2,'0')}:00 | ${plan} | ${actual} |\n`;
+    const hr = dd[h] || {};
+    md += `| ${String(h).padStart(2,'0')}:00 | ${(hr.p||'—').replace(/\n/g,' ')} | ${(hr.a||'—').replace(/\n/g,' ')} |\n`;
   }
-
-  navigator.clipboard.writeText(md).then(() => {
-    const el = document.getElementById('save-indicator');
-    el.textContent = '📋 Copied to clipboard!';
-    el.classList.add('show');
-    setTimeout(() => { el.classList.remove('show'); el.textContent = '✅ Saved'; }, 2000);
-  });
+  navigator.clipboard.writeText(md);
+  const t = document.getElementById('toast'); t.textContent='Copied'; t.classList.add('show');
+  setTimeout(()=>{ t.classList.remove('show'); t.textContent='Saved'; }, 1500);
 }
 
-function exportJSON() {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `dayplanner-${dateKey(new Date())}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importJSON() {
-  document.getElementById('import-input').click();
-}
-
-document.getElementById('import-input').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    try {
-      const imported = JSON.parse(ev.target.result);
-      Object.assign(data, imported);
-      saveData();
-      renderSidebar();
-      renderSchedule();
-    } catch(err) { alert('Invalid JSON file'); }
-  };
-  reader.readAsText(file);
+document.addEventListener('keydown', e => {
+  if (e.target.tagName==='TEXTAREA') return;
+  if (e.key==='ArrowLeft') prevDay();
+  if (e.key==='ArrowRight') nextDay();
+  if (e.key==='t') goToday();
 });
-
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if (e.target.contentEditable === 'true') return;
-  if (e.key === 'ArrowLeft') prevDay();
-  if (e.key === 'ArrowRight') nextDay();
-  if (e.key === 't') goToday();
-});
-
-// API for programmatic updates
-window.plannerAPI = {
-  setHour: (dateStr, hour, plan, actual) => {
-    if (plan !== undefined) setHourData(dateStr, hour, 'plan', plan);
-    if (actual !== undefined) setHourData(dateStr, hour, 'actual', actual);
-    if (dateKey(currentDate) === dateStr) renderSchedule();
-  },
-  getDay: (dateStr) => getDayData(dateStr),
-  getAllData: () => data
-};
 
 // Init
-loadData();
+load();
 
-// Pre-populate today if empty
-const todayKey = dateKey(new Date());
-const todayData = getDayData(todayKey);
-const hasAnyPlan = Object.values(todayData.hours).some(h => h.plan);
-
-if (!hasAnyPlan) {
-  // Gayan's default schedule for today (Tue Feb 25)
-  const defaults = {
-    7: { plan: '🏋️ Gym — cardiac health, non-negotiable', actual: '' },
-    8: { plan: '🚿 Get ready + breakfast', actual: '' },
-    9: { plan: '🚗 Wash car', actual: '' },
-    10: { plan: '📸 Pick up printed photos', actual: '' },
-    11: { plan: '🎁 Get gift for Andy', actual: '' },
-    12: { plan: '🍽️ Lunch', actual: '' },
-    13: { plan: '💼 Day job', actual: '' },
-    14: { plan: '💼 Day job', actual: '' },
-    15: { plan: '💼 Day job', actual: '' },
-    16: { plan: '💼 Day job', actual: '' },
-    17: { plan: '💼 Day job', actual: '' },
-    18: { plan: '📖 Study time with Rylie — P3 weighted assessments', actual: '' },
-    19: { plan: '🍽️ Dinner + family time', actual: '' },
-    20: { plan: '📞 Ventaz Sales — 3hr block (Hour 1: 15 outreaches)', actual: '' },
-    21: { plan: '📞 Ventaz Sales — (Hour 2: Follow-ups + demos)', actual: '' },
-    22: { plan: '📞 Ventaz Sales — (Hour 3: Close + update CRM)', actual: '' },
-    23: { plan: '🌙 Wind down + plan tomorrow', actual: '' },
+// Seed today
+const tk = dk(new Date());
+if (!data[tk] || !Object.values(data[tk]).some(v=>v.p)) {
+  const s = {
+    7: { p: '🏋️ Gym', a: '' },
+    8: { p: 'Get ready + breakfast', a: '' },
+    9: { p: '🚗 Wash car', a: '' },
+    10: { p: '📸 Pick up printed photos', a: '' },
+    11: { p: '🎁 Get gift for Andy', a: '' },
+    12: { p: 'Lunch', a: '' },
+    13: { p: 'Day job', a: '' },
+    14: { p: 'Day job', a: '' },
+    15: { p: 'Day job', a: '' },
+    16: { p: 'Day job', a: '' },
+    17: { p: 'Day job', a: '' },
+    18: { p: '📖 Rylie study — P3 weighted assessments', a: '' },
+    19: { p: 'Dinner + family', a: '' },
+    20: { p: '📞 Ventaz Sales — outreach (15 DMs)', a: '' },
+    21: { p: '📞 Ventaz Sales — follow-ups + demos', a: '' },
+    22: { p: '📞 Ventaz Sales — close + update CRM', a: '' },
+    23: { p: 'Wind down + plan tomorrow', a: '' },
   };
-
-  Object.entries(defaults).forEach(([h, d]) => {
-    if (!todayData.hours[h]) todayData.hours[h] = d;
-  });
-  saveData();
+  Object.entries(s).forEach(([h,v]) => { if(!gd(tk)[h]) gd(tk)[h] = v; });
+  save();
 }
 
-renderSidebar();
-renderSchedule();
+renderNav();
+renderGrid();
 </script>
 </body>
 </html>
