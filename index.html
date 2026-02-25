@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Day Planner</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #fff;
@@ -107,6 +108,7 @@
     <div class="header-right">
       <button class="nav-btn" onclick="prevDay()">‹</button>
       <button class="nav-btn" onclick="nextDay()">›</button>
+      <span id="sync-status" style="font-size:11px;color:var(--text-faint)">⚡ Local</span>
       <button class="export-btn" onclick="exportMD()">Export</button>
     </div>
   </div>
@@ -120,14 +122,84 @@
 <div class="toast" id="toast">Saved</div>
 <script>
 const STORE = 'dp_v10';
+const SUPA_URL = 'https://zciwoergnubcqvamkltr.supabase.co';
+const SUPA_KEY = 'sb_publishable_VIJkNAYzWyS8hYknDXlQgw_fj08uQRF';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
 let cur = new Date();
 let data = {};
+let syncStatus = 'offline';
 
-function load() { try { data = JSON.parse(localStorage.getItem(STORE) || '{}'); } catch(e) { data = {}; } }
+// Load: localStorage first (instant), then Supabase (async merge)
+function load() {
+  try { data = JSON.parse(localStorage.getItem(STORE) || '{}'); } catch(e) { data = {}; }
+  cloudLoad();
+}
+
+async function cloudLoad() {
+  try {
+    const { data: row, error } = await sb.from('planner').select('data').eq('id', 'default').single();
+    if (error && error.code === 'PGRST116') {
+      // No row yet — insert initial
+      await sb.from('planner').insert({ id: 'default', data: data });
+      syncStatus = 'synced';
+    } else if (row) {
+      // Merge cloud data with local (cloud wins for conflicts)
+      const cloud = row.data || {};
+      Object.keys(cloud).forEach(k => {
+        if (!data[k]) data[k] = cloud[k];
+        else {
+          // Merge slots within each day
+          Object.keys(cloud[k]).forEach(sk => {
+            if (!data[k][sk]) data[k][sk] = cloud[k][sk];
+            else {
+              // Keep whichever has more content
+              const local = data[k][sk];
+              const remote = cloud[k][sk];
+              if ((remote.p && !local.p) || (remote.a && !local.a)) {
+                data[k][sk] = { p: remote.p || local.p, a: remote.a || local.a };
+              }
+            }
+          });
+        }
+      });
+      // Also push any local-only days to merged
+      localStorage.setItem(STORE, JSON.stringify(data));
+      syncStatus = 'synced';
+    }
+    updateSyncBadge();
+    renderGrid();
+  } catch(e) {
+    syncStatus = 'offline';
+    updateSyncBadge();
+  }
+}
+
+function updateSyncBadge() {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  if (syncStatus === 'synced') { el.textContent = '☁️ Synced'; el.style.color = 'var(--text-dim)'; }
+  else if (syncStatus === 'saving') { el.textContent = '⏳ Saving...'; el.style.color = 'var(--accent)'; }
+  else { el.textContent = '⚡ Local'; el.style.color = 'var(--text-faint)'; }
+}
+
+let cloudTimeout;
 function save() {
   localStorage.setItem(STORE, JSON.stringify(data));
   const t = document.getElementById('toast'); t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1200);
+  // Debounced cloud save
+  clearTimeout(cloudTimeout);
+  syncStatus = 'saving'; updateSyncBadge();
+  cloudTimeout = setTimeout(cloudSave, 2000);
+}
+
+async function cloudSave() {
+  try {
+    const { error } = await sb.from('planner').upsert({ id: 'default', data: data, updated_at: new Date().toISOString() });
+    syncStatus = error ? 'offline' : 'synced';
+  } catch(e) { syncStatus = 'offline'; }
+  updateSyncBadge();
 }
 
 function dk(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
