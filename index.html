@@ -6,6 +6,19 @@
 <title>Day Planner</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  /* ===== PIN LOCK ===== */
+  .lock-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .lock-screen.hidden { display: none; }
+  .lock-box { text-align: center; }
+  .lock-box h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .lock-box p { font-size: 12px; color: #888; margin-bottom: 20px; }
+  .lock-input { width: 200px; padding: 12px 16px; font-size: 20px; text-align: center; letter-spacing: 8px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-family: inherit; outline: none; color: #000; -webkit-text-security: disc; }
+  .lock-input:focus { border-color: #c46b2e; }
+  .lock-input.shake { animation: shake 0.4s ease; border-color: #c0392b; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .lock-hint { font-size: 11px; color: #bbb; margin-top: 12px; }
+  .lock-screen:not(.hidden) ~ .sidebar, .lock-screen:not(.hidden) ~ .main { visibility: hidden; }
+
   :root {
     --bg: #fff;
     --surface: #f7f7f7;
@@ -221,6 +234,16 @@
 </head>
 <body>
 
+<!-- PIN LOCK SCREEN -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-box">
+    <h1>Day Planner</h1>
+    <p>Enter your PIN to continue</p>
+    <input class="lock-input" id="lock-input" type="password" inputmode="numeric" maxlength="6" autocomplete="off" autofocus>
+    <div class="lock-hint">6-digit PIN</div>
+  </div>
+</div>
+
 <div class="sidebar">
   <div class="sidebar-header"><h1>Day Planner</h1></div>
   <button class="side-btn today-btn" onclick="goToday()">Today</button>
@@ -369,6 +392,52 @@
 <div class="toast" id="toast">Saved</div>
 
 <script>
+// ===== PIN LOCK =====
+const PIN_HASH = 'f417d47f2a94c651b15b28ae6fff19638508d6a599625e64ce3f003d8d502e73';
+const PIN_STORE = 'dp_auth_v1';
+
+function sha256(str) {
+  const buf = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', buf).then(h => {
+    return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
+  });
+}
+
+function checkAuth() {
+  const authed = localStorage.getItem(PIN_STORE);
+  if (authed === PIN_HASH) {
+    document.getElementById('lock-screen').classList.add('hidden');
+    return true;
+  }
+  document.getElementById('lock-screen').classList.remove('hidden');
+  const inp = document.getElementById('lock-input');
+  inp.focus();
+  inp.addEventListener('input', async function() {
+    if (this.value.length === 6) {
+      const hash = await sha256(this.value);
+      if (hash === PIN_HASH) {
+        localStorage.setItem(PIN_STORE, PIN_HASH);
+        document.getElementById('lock-screen').classList.add('hidden');
+        initApp();
+      } else {
+        this.classList.add('shake');
+        setTimeout(() => { this.classList.remove('shake'); this.value = ''; }, 400);
+      }
+    }
+  });
+  return false;
+}
+
+let appInitialized = false;
+function initApp() {
+  if (appInitialized) return;
+  appInitialized = true;
+  load(); loadInbox(); loadCRM();
+  const tk = dk(new Date());
+  if (!data[tk] || Object.keys(data[tk]).length === 0) { seedToday(); }
+  renderNav(); renderGrid();
+}
+
 const STORE = 'dp_v12';
 const INBOX_STORE = 'dp_inbox_v1';
 const CRM_STORE = 'dp_crm_v1';
@@ -950,13 +1019,9 @@ document.addEventListener('keydown', e => {
   if (e.target.id === 'inbox-input' && e.key === 'Enter') { e.preventDefault(); addInboxItem(); }
 });
 
-// ===== INIT =====
-load();
-loadInbox();
-loadCRM();
-
-const tk = dk(new Date());
-if (!data[tk] || Object.keys(data[tk]).length === 0) {
+// ===== SEED DATA =====
+function seedToday() {
+  const tk = dk(new Date());
   const s = {
     '07:00': { p: '🏋️ Gym', a: '' }, '07:30': { p: '🏋️ Gym', a: '' }, '08:00': { p: '🏋️ Gym', a: '' },
     '08:30': { p: 'Get ready + breakfast', a: '' },
@@ -1010,8 +1075,8 @@ if (crm.leads.length === 0) {
   saveCRM();
 }
 
-renderNav();
-renderGrid();
+// ===== INIT =====
+if (checkAuth()) initApp();
 </script>
 </body>
 </html>
