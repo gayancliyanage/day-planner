@@ -17,7 +17,7 @@
   .lock-input.shake { animation: shake 0.4s ease; border-color: #c0392b; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
   .lock-hint { font-size: 11px; color: #bbb; margin-top: 12px; }
-  .lock-screen:not(.hidden) ~ .sidebar, .lock-screen:not(.hidden) ~ .main { visibility: hidden; }
+  .lock-screen:not(.hidden) ~ .sidebar, .lock-screen:not(.hidden) ~ .main, .lock-screen:not(.hidden) ~ .mobile-nav { visibility: hidden; }
 
   :root {
     --bg: #fff;
@@ -219,16 +219,109 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+  /* ===== MOBILE BOTTOM NAV ===== */
+  .mobile-nav { display: none; }
+
+  /* ===== MOBILE MOVE PICKER (touch alternative to drag) ===== */
+  .move-bar { display: none; position: fixed; bottom: 60px; left: 0; right: 0; background: var(--text); color: var(--white); padding: 10px 16px; z-index: 150; font-size: 12px; font-weight: 500; text-align: center; animation: slideUp 0.2s ease; }
+  .move-bar.show { display: block; }
+  .move-bar .move-label { margin-bottom: 8px; opacity: 0.8; }
+  .move-bar .move-targets { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+  .move-bar .move-target { padding: 6px 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
+  .move-bar .move-target:hover, .move-bar .move-target:active { background: rgba(255,255,255,0.15); }
+  .move-bar .move-cancel { margin-top: 8px; padding: 4px 12px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 11px; cursor: pointer; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  /* ===== CRM LIST VIEW (mobile) ===== */
+  .crm-list { display: none; }
+  .crm-list-section { margin-bottom: 16px; }
+  .crm-list-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 8px 0 6px; display: flex; align-items: center; justify-content: space-between; }
+  .crm-list-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+  .crm-list-card.overdue { border-left: 3px solid var(--danger); }
+  .crm-list-card.due-today { border-left: 3px solid var(--accent); }
+  .crm-list-company { font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .crm-list-contact { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .crm-list-next { font-size: 12px; color: var(--text-mid); margin-top: 6px; }
+  .crm-list-meta { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+  .crm-list-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .crm-list-actions button { flex: 1; padding: 8px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
+  .crm-list-actions button:active { background: var(--border); }
+  .crm-list-actions .move-btn { border-color: var(--accent); color: var(--accent); }
+
   @media (max-width: 768px) {
     .sidebar { display: none; }
-    .schedule { padding: 0 16px 40px; }
-    .main-header { padding: 16px 16px 10px; }
-    .day-summary { padding: 0 16px 10px; }
-    .inbox-top, .inbox-input-row, .inbox-cloud { padding-left: 16px; padding-right: 16px; }
-    .matrix { padding: 0 16px 16px; }
-    .crm-top, .crm-stats { padding-left: 16px; padding-right: 16px; }
-    .kanban { padding: 12px 16px; }
-    .kanban-col { min-width: 200px; width: 200px; }
+    body { padding-bottom: 56px; }
+
+    /* Bottom nav */
+    .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 56px; background: var(--white); border-top: 1px solid var(--border); z-index: 90; }
+    .mobile-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 10px; font-weight: 600; padding: 0; }
+    .mobile-nav button .nav-icon { font-size: 20px; }
+    .mobile-nav button.active { color: var(--accent); }
+    .mobile-nav button .nav-badge { position: absolute; top: 4px; right: calc(50% - 18px); background: var(--accent); color: var(--white); font-size: 9px; font-weight: 700; padding: 0 5px; border-radius: 8px; min-width: 14px; text-align: center; }
+
+    /* Planner mobile */
+    .main-header { padding: 12px 16px 8px; }
+    .main-header h2 { font-size: 17px; }
+    .day-summary { padding: 0 16px 8px; gap: 12px; }
+    .schedule { padding: 0 12px 70px; }
+    .col-headers { grid-template-columns: 44px 1fr 1fr; }
+    .slot-row { grid-template-columns: 44px 1fr 1fr; min-height: 44px; }
+    .slot-time { font-size: 10px; padding: 10px 6px 10px 0; }
+    .cell-input { font-size: 13px; padding: 4px 6px; min-height: 28px; }
+    .nav-btn { width: 36px; height: 36px; font-size: 16px; }
+    .header-right { gap: 4px; }
+
+    /* Inbox mobile */
+    .inbox-overlay { padding-bottom: 56px; }
+    .inbox-top { padding: 14px 16px 0; }
+    .inbox-top h2 { font-size: 17px; }
+    .inbox-close { padding: 8px 14px; }
+    .inbox-input-row { padding: 12px 16px 0; }
+    .inbox-input { padding: 12px 14px; font-size: 14px; }
+    .inbox-add-btn { padding: 12px 16px; font-size: 13px; }
+    .inbox-cloud { padding: 12px 16px; }
+    .cloud-item { padding: 8px 14px; font-size: 13px; }
+    .cloud-item .del { font-size: 18px; padding: 4px; }
+    .matrix { padding: 0 12px 70px; grid-template-rows: auto 1fr 1fr; }
+    .quadrant { padding: 8px; }
+    .q-label { font-size: 9px; }
+    .q-item { padding: 8px 10px; font-size: 13px; }
+    .q-item .q-actions { opacity: 1; }
+    .q-item-btn { font-size: 14px; padding: 4px 8px; }
+
+    /* CRM mobile — list view instead of kanban */
+    .crm-overlay { padding-bottom: 56px; }
+    .crm-top { padding: 14px 16px 0; flex-wrap: wrap; gap: 8px; }
+    .crm-top h2 { font-size: 17px; }
+    .crm-stats { padding: 8px 16px 0; gap: 12px; flex-wrap: wrap; }
+    .kanban { display: none; }
+    .crm-list { display: block; flex: 1; overflow-y: auto; padding: 12px 16px 70px; }
+
+    /* Modal mobile */
+    .modal { width: calc(100vw - 24px); max-width: 420px; max-height: 85vh; padding: 20px 16px; border-radius: 16px 16px 0 0; }
+    .modal-bg.open { align-items: flex-end; }
+    .modal-row { grid-template-columns: 1fr; gap: 0; }
+    .modal input, .modal select, .modal textarea { padding: 10px 12px; font-size: 14px; }
+    .modal-actions button { padding: 12px 20px; font-size: 13px; }
+    .add-activity-row { flex-wrap: wrap; }
+    .add-activity-row select { width: 100%; margin-bottom: 6px; }
+    .add-activity-row input { width: 100%; }
+    .add-activity-row button { width: 100%; padding: 10px; }
+
+    /* Plan modal */
+    #plan-modal .modal { width: calc(100vw - 24px); }
+
+    /* Toast above nav */
+    .toast { bottom: 70px; }
+
+    /* Lock screen mobile */
+    .lock-input { font-size: 24px; padding: 14px 16px; width: 220px; }
+  }
+
+  @media (max-width: 380px) {
+    .slot-row { grid-template-columns: 38px 1fr 1fr; }
+    .col-headers { grid-template-columns: 38px 1fr 1fr; }
+    .slot-time { font-size: 9px; }
   }
 </style>
 </head>
@@ -312,6 +405,7 @@
   </div>
   <div class="crm-stats" id="crm-stats"></div>
   <div class="kanban" id="kanban"></div>
+  <div class="crm-list" id="crm-list"></div>
 </div>
 
 <!-- LEAD FORM MODAL -->
@@ -387,6 +481,28 @@
       <button class="confirm" onclick="confirmPlan()">Add to Plan</button>
     </div>
   </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="active" onclick="mobileTab('planner')" id="mtab-planner">
+    <span class="nav-icon">📅</span>Planner
+  </button>
+  <button onclick="mobileTab('inbox')" id="mtab-inbox" style="position:relative">
+    <span class="nav-icon">🧠</span>Inbox
+    <span class="nav-badge" id="m-inbox-count" style="display:none">0</span>
+  </button>
+  <button onclick="mobileTab('pipeline')" id="mtab-pipeline" style="position:relative">
+    <span class="nav-icon">📊</span>Pipeline
+    <span class="nav-badge" id="m-pipeline-count" style="display:none">0</span>
+  </button>
+</div>
+
+<!-- MOBILE MOVE BAR (touch alternative to drag) -->
+<div class="move-bar" id="move-bar">
+  <div class="move-label" id="move-label">Move item to:</div>
+  <div class="move-targets" id="move-targets"></div>
+  <button class="move-cancel" onclick="cancelMove()">Cancel</button>
 </div>
 
 <div class="toast" id="toast">Saved</div>
@@ -1074,6 +1190,231 @@ if (crm.leads.length === 0) {
   });
   saveCRM();
 }
+
+// ===== MOBILE TAB NAVIGATION =====
+function mobileTab(tab) {
+  document.querySelectorAll('.mobile-nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('mtab-' + tab).classList.add('active');
+  closeInbox(); closeCRM();
+  if (tab === 'inbox') openInbox();
+  else if (tab === 'pipeline') openCRM();
+}
+
+// ===== MOBILE SWIPE GESTURES =====
+let touchStartX = 0, touchStartY = 0;
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (e.target.closest('.kanban, .inbox-cloud, .matrix, .modal, .cell-input, .crm-list')) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2) {
+    // Only swipe on planner view
+    if (!document.getElementById('inbox-overlay').classList.contains('open') &&
+        !document.getElementById('crm-overlay').classList.contains('open')) {
+      if (dx > 0) prevDay(); else nextDay();
+    }
+  }
+}, { passive: true });
+
+// ===== MOBILE MOVE SYSTEM (tap alternative to drag) =====
+let moveItem = null; // { source, idx, text }
+
+function startMove(source, idx, text) {
+  moveItem = { source, idx, text };
+  const bar = document.getElementById('move-bar');
+  const label = document.getElementById('move-label');
+  const targets = document.getElementById('move-targets');
+
+  label.textContent = `Move: "${text.substring(0, 40)}${text.length > 40 ? '...' : ''}"`;
+
+  let btns = '';
+  if (source === 'inbox') {
+    btns = `
+      <div class="move-target" onclick="doMove('ui')">🔴 Urgent+Important</div>
+      <div class="move-target" onclick="doMove('ni')">🟠 Important</div>
+      <div class="move-target" onclick="doMove('un')">⚪ Urgent</div>
+      <div class="move-target" onclick="doMove('nn')">⬜ Neither</div>`;
+  } else {
+    btns = `
+      <div class="move-target" onclick="doMove('inbox')">📥 Back to Inbox</div>
+      <div class="move-target" onclick="doMove('ui')">🔴 Urgent+Imp</div>
+      <div class="move-target" onclick="doMove('ni')">🟠 Important</div>
+      <div class="move-target" onclick="doMove('un')">⚪ Urgent</div>
+      <div class="move-target" onclick="doMove('nn')">⬜ Neither</div>`;
+  }
+  targets.innerHTML = btns;
+  bar.classList.add('show');
+}
+
+function doMove(targetQ) {
+  if (!moveItem) return;
+  let text;
+  if (moveItem.source === 'inbox') {
+    text = inbox.items[moveItem.idx];
+    inbox.items.splice(moveItem.idx, 1);
+  } else {
+    text = inbox.quadrants[moveItem.source][moveItem.idx];
+    inbox.quadrants[moveItem.source].splice(moveItem.idx, 1);
+  }
+  if (targetQ === 'inbox') inbox.items.push(text);
+  else inbox.quadrants[targetQ].push(text);
+  saveInbox(); renderInbox();
+  cancelMove();
+}
+
+function cancelMove() {
+  moveItem = null;
+  document.getElementById('move-bar').classList.remove('show');
+}
+
+// ===== MOBILE CRM STAGE MOVE =====
+function mobileMoveStage(leadId) {
+  const lead = crm.leads.find(l => l.id === leadId);
+  if (!lead) return;
+  const bar = document.getElementById('move-bar');
+  const label = document.getElementById('move-label');
+  const targets = document.getElementById('move-targets');
+
+  label.textContent = `Move: ${lead.company}`;
+  let btns = '';
+  STAGES.forEach(st => {
+    if (st.id !== lead.stage) {
+      btns += `<div class="move-target" onclick="doMoveStage(${leadId},'${st.id}')">${st.label}</div>`;
+    }
+  });
+  targets.innerHTML = btns;
+  bar.classList.add('show');
+}
+
+function doMoveStage(leadId, stage) {
+  const lead = crm.leads.find(l => l.id === leadId);
+  if (!lead) return;
+  lead.stage = stage;
+  lead.updatedAt = Date.now();
+  if (stage === 'won') lead.wonAt = new Date().toISOString().slice(0,10);
+  saveCRM(); renderCRM();
+  cancelMove();
+  toast(`Moved to ${STAGES.find(s=>s.id===stage).label}`);
+}
+
+// ===== MOBILE CRM LIST RENDERER =====
+function renderCRMList() {
+  const container = document.getElementById('crm-list');
+  if (!container) return;
+  const today = new Date().toISOString().slice(0,10);
+  let html = '';
+
+  STAGES.filter(st => !['lost'].includes(st.id)).forEach(st => {
+    const leads = crm.leads.filter(l => l.stage === st.id).sort((a,b) => {
+      if (a.due && b.due) return a.due.localeCompare(b.due);
+      if (a.due) return -1; if (b.due) return 1; return 0;
+    });
+    if (leads.length === 0) return;
+
+    html += `<div class="crm-list-section">
+      <div class="crm-list-title" style="color:${st.color}">${st.label} <span class="kanban-col-count">${leads.length}</span></div>`;
+
+    leads.forEach(lead => {
+      const isOverdue = lead.due && lead.due < today;
+      const isToday = lead.due === today;
+      const cardClass = isOverdue ? ' overdue' : isToday ? ' due-today' : '';
+      const dueClass = isOverdue ? 'overdue' : isToday ? 'today' : 'upcoming';
+      const actCount = (lead.activities || []).length;
+
+      html += `<div class="crm-list-card${cardClass}">
+        <div class="crm-list-company">
+          <span>${esc(lead.company)}</span>
+          ${lead.value ? `<span class="lead-value">$${lead.value.toLocaleString()}/mo</span>` : ''}
+        </div>
+        ${lead.contact ? `<div class="crm-list-contact">👤 ${esc(lead.contact)}${lead.role ? ' · ' + esc(lead.role) : ''}</div>` : ''}
+        ${lead.next ? `<div class="crm-list-next">→ ${esc(lead.next)}</div>` : ''}
+        <div class="crm-list-meta">
+          ${lead.due ? `<span class="lead-due ${dueClass}">${lead.due}</span>` : ''}
+          ${lead.source ? `<span style="font-size:10px;color:var(--text-faint)">${esc(lead.source)}</span>` : ''}
+          ${actCount ? `<span style="font-size:10px;color:var(--text-faint)">${actCount} activities</span>` : ''}
+        </div>
+        <div class="crm-list-actions">
+          <button onclick="editLead(${lead.id})">✏️ Edit</button>
+          <button onclick="quickLog(${lead.id})">📝 Log</button>
+          <button class="move-btn" onclick="mobileMoveStage(${lead.id})">↗️ Move</button>
+        </div>
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  // Lost leads collapsed
+  const lost = crm.leads.filter(l => l.stage === 'lost');
+  if (lost.length) {
+    html += `<details class="crm-list-section"><summary class="crm-list-title" style="color:var(--danger);cursor:pointer">❌ Lost <span class="kanban-col-count">${lost.length}</span></summary>`;
+    lost.forEach(lead => {
+      html += `<div class="crm-list-card">
+        <div class="crm-list-company"><span>${esc(lead.company)}</span></div>
+        <div class="crm-list-actions">
+          <button onclick="editLead(${lead.id})">✏️ Edit</button>
+          <button class="move-btn" onclick="mobileMoveStage(${lead.id})">↗️ Revive</button>
+        </div>
+      </div>`;
+    });
+    html += '</details>';
+  }
+
+  container.innerHTML = html;
+}
+
+// Override renderCRM to also render list
+const _origRenderCRM = renderCRM;
+renderCRM = function() { _origRenderCRM(); renderCRMList(); };
+
+// Override badge updates for mobile
+const _origInboxBadge = updateInboxBadge;
+updateInboxBadge = function() {
+  _origInboxBadge();
+  const total = inbox.items.length + Object.values(inbox.quadrants).reduce((s, a) => s + a.length, 0);
+  const mel = document.getElementById('m-inbox-count');
+  if (mel) { mel.textContent = total; mel.style.display = total > 0 ? '' : 'none'; }
+};
+
+const _origPipelineBadge = updatePipelineBadge;
+updatePipelineBadge = function() {
+  _origPipelineBadge();
+  const active = crm.leads.filter(l => l.stage !== 'won' && l.stage !== 'lost').length;
+  const mel = document.getElementById('m-pipeline-count');
+  if (mel) { mel.textContent = active; mel.style.display = active > 0 ? '' : 'none'; }
+};
+
+// ===== MOBILE TOUCH SUPPORT FOR INBOX =====
+// Override renderInbox to add mobile move buttons
+const _origRenderInbox = renderInbox;
+renderInbox = function() {
+  const container = document.getElementById('cloud-items');
+  if (inbox.items.length === 0) {
+    container.innerHTML = '<div class="inbox-empty">No items yet — type above to brain dump!</div>';
+  } else {
+    container.innerHTML = inbox.items.map((item, i) =>
+      `<div class="cloud-item" draggable="true" ondragstart="startDrag(event,'inbox',${i},'${esc(item)}')" ondragend="endDrag(event)"
+            ontouchend="if(window.innerWidth<769){event.preventDefault();startMove('inbox',${i},'${esc(item).replace(/'/g,"\\'")}');}">
+        <span>${esc(item)}</span><span class="del" onclick="event.stopPropagation();removeInboxItem(${i})">×</span></div>`
+    ).join('');
+  }
+  ['ui','ni','un','nn'].forEach(q => {
+    document.getElementById('qi-' + q).innerHTML = inbox.quadrants[q].map((item, i) =>
+      `<div class="q-item" draggable="true" ondragstart="startDrag(event,'${q}',${i},'${esc(item)}')" ondragend="endDrag(event)"
+            ontouchend="if(window.innerWidth<769){event.preventDefault();startMove('${q}',${i},'${esc(item).replace(/'/g,"\\'")}');}">
+        <span>${esc(item)}</span>
+        <div class="q-actions">
+          <button class="q-item-btn plan-btn" onclick="event.stopPropagation();planItem('${esc(item)}','${q}',${i})" title="Add to calendar">📅</button>
+          <button class="q-item-btn del-btn" onclick="event.stopPropagation();removeQItem('${q}',${i})" title="Remove">×</button>
+        </div></div>`
+    ).join('');
+  });
+  updateInboxBadge();
+};
 
 // ===== INIT =====
 if (checkAuth()) initApp();
