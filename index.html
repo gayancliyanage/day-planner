@@ -17,6 +17,11 @@
     --text-faint: #bbb;
     --accent: #c46b2e;
     --white: #fff;
+    --danger: #c0392b;
+    --q1: #2c2c2c;
+    --q2: #c46b2e;
+    --q3: #666;
+    --q4: #aaa;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 14px; -webkit-font-smoothing: antialiased; }
@@ -24,8 +29,12 @@
   .sidebar { width: 220px; min-width: 220px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
   .sidebar-header { padding: 24px 20px 16px; }
   .sidebar-header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
-  .today-btn { margin: 0 16px 12px; padding: 7px 0; background: var(--text); color: var(--white); border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; }
+  .today-btn { margin: 0 16px 8px; padding: 7px 0; background: var(--text); color: var(--white); border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; }
   .today-btn:hover { background: #333; }
+  .inbox-btn { margin: 0 16px 12px; padding: 7px 0; background: var(--white); color: var(--text); border: 1.5px solid var(--accent); border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .inbox-btn:hover { background: var(--accent); color: var(--white); }
+  .inbox-btn .badge { background: var(--accent); color: var(--white); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+  .inbox-btn:hover .badge { background: var(--white); color: var(--accent); }
   .nav-scroll { flex: 1; overflow-y: auto; padding-bottom: 20px; }
   .year-label { padding: 10px 20px 4px; font-size: 11px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
   .month-label { padding: 6px 20px; font-size: 12px; font-weight: 600; color: var(--text-mid); cursor: pointer; display: flex; align-items: center; gap: 6px; }
@@ -79,8 +88,83 @@
   .actual-cell .cell-input { color: var(--text-mid); }
   .actual-cell .cell-input::placeholder { color: var(--border); }
 
-  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--white); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--white); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000; }
   .toast.show { opacity: 1; }
+
+  /* ===== SMART INBOX OVERLAY ===== */
+  .inbox-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 100; display: none; flex-direction: column; overflow: hidden; }
+  .inbox-overlay.open { display: flex; }
+
+  .inbox-top { padding: 20px 32px 0; display: flex; align-items: center; justify-content: space-between; }
+  .inbox-top h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .inbox-close { background: none; border: 1px solid var(--border); color: var(--text-mid); padding: 5px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 500; }
+  .inbox-close:hover { background: var(--surface); color: var(--text); }
+
+  /* Inbox input */
+  .inbox-input-row { padding: 16px 32px 0; display: flex; gap: 8px; }
+  .inbox-input { flex: 1; padding: 10px 14px; font-size: 13px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; outline: none; color: var(--text); }
+  .inbox-input:focus { border-color: var(--accent); }
+  .inbox-input::placeholder { color: var(--text-faint); }
+  .inbox-add-btn { background: var(--text); color: var(--white); border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
+  .inbox-add-btn:hover { background: #333; }
+
+  /* Cloud / floating items */
+  .inbox-cloud { padding: 16px 32px; min-height: 80px; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; align-content: flex-start; }
+  .inbox-cloud.drag-over { background: rgba(196,107,46,0.06); border-radius: 8px; }
+  .inbox-cloud-label { width: 100%; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-faint); margin-bottom: 4px; }
+  .cloud-item { background: var(--surface); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: grab; user-select: none; display: flex; align-items: center; gap: 6px; transition: all 0.15s; animation: floatIn 0.3s ease; }
+  .cloud-item:hover { border-color: var(--accent); background: rgba(196,107,46,0.06); }
+  .cloud-item:active { cursor: grabbing; }
+  .cloud-item .del { color: var(--text-faint); cursor: pointer; font-size: 14px; line-height: 1; }
+  .cloud-item .del:hover { color: var(--danger); }
+  @keyframes floatIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .inbox-empty { color: var(--text-faint); font-size: 12px; font-style: italic; padding: 12px 0; }
+
+  /* Eisenhower Matrix */
+  .matrix { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr 1fr; padding: 0 32px 24px; gap: 0; overflow: hidden; min-height: 0; }
+  .matrix-axis-top { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; padding: 0 0 6px; }
+  .matrix-axis-top span { text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); }
+  .quadrant { border: 1px solid var(--border); padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; min-height: 0; position: relative; }
+  .quadrant.drag-over { background: rgba(196,107,46,0.05); }
+  .q-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .q1 { border-radius: 10px 0 0 0; }
+  .q2 { border-radius: 0 10px 0 0; border-left: 0; }
+  .q3 { border-radius: 0 0 0 10px; border-top: 0; }
+  .q4 { border-radius: 0 0 10px 0; border-top: 0; border-left: 0; }
+  .q1 .q-label { color: var(--q1); }
+  .q2 .q-label { color: var(--q2); }
+  .q3 .q-label { color: var(--q3); }
+  .q4 .q-label { color: var(--q4); }
+
+  .q-item { background: var(--white); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: grab; user-select: none; display: flex; align-items: center; justify-content: space-between; gap: 6px; transition: all 0.15s; }
+  .q-item:hover { border-color: var(--accent); }
+  .q-item:active { cursor: grabbing; }
+  .q-item .q-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+  .q-item:hover .q-actions { opacity: 1; }
+  .q-item-btn { background: none; border: none; cursor: pointer; font-size: 11px; padding: 2px 4px; border-radius: 3px; color: var(--text-dim); }
+  .q-item-btn:hover { background: var(--surface); color: var(--text); }
+  .q-item-btn.plan-btn { color: var(--accent); font-weight: 600; }
+  .q-item-btn.plan-btn:hover { background: rgba(196,107,46,0.1); }
+  .q-item-btn.del-btn:hover { color: var(--danger); }
+
+  /* Side labels */
+  .matrix-row-labels { display: none; }
+
+  /* Plan modal */
+  .plan-modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 200; display: none; align-items: center; justify-content: center; }
+  .plan-modal-bg.open { display: flex; }
+  .plan-modal { background: var(--white); border-radius: 12px; padding: 24px; width: 340px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .plan-modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .plan-modal .task-name { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 16px; }
+  .plan-modal label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); display: block; margin-bottom: 6px; }
+  .plan-modal select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: inherit; margin-bottom: 16px; outline: none; }
+  .plan-modal select:focus { border-color: var(--accent); }
+  .plan-modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .plan-modal-actions button { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; }
+  .plan-modal-actions .cancel { background: var(--surface); color: var(--text-mid); }
+  .plan-modal-actions .confirm { background: var(--text); color: var(--white); }
+  .plan-modal-actions .confirm:hover { background: #333; }
 
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -91,6 +175,8 @@
     .schedule { padding: 0 16px 40px; }
     .main-header { padding: 16px 16px 10px; }
     .day-summary { padding: 0 16px 10px; }
+    .inbox-top, .inbox-input-row, .inbox-cloud { padding-left: 16px; padding-right: 16px; }
+    .matrix { padding: 0 16px 16px; }
   }
 </style>
 </head>
@@ -99,6 +185,7 @@
 <div class="sidebar">
   <div class="sidebar-header"><h1>Day Planner</h1></div>
   <button class="today-btn" onclick="goToday()">Today</button>
+  <button class="inbox-btn" onclick="openInbox()">🧠 Smart Inbox <span class="badge" id="inbox-count">0</span></button>
   <div class="nav-scroll" id="sidebar-nav"></div>
 </div>
 
@@ -119,9 +206,68 @@
   </div>
 </div>
 
+<!-- SMART INBOX OVERLAY -->
+<div class="inbox-overlay" id="inbox-overlay">
+  <div class="inbox-top">
+    <h2>🧠 Smart Inbox</h2>
+    <button class="inbox-close" onclick="closeInbox()">← Back to Planner</button>
+  </div>
+
+  <div class="inbox-input-row">
+    <input class="inbox-input" id="inbox-input" type="text" placeholder="Brain dump — type anything and press Enter..." autocomplete="off">
+    <button class="inbox-add-btn" onclick="addInboxItem()">+ Add</button>
+  </div>
+
+  <div class="inbox-cloud" id="inbox-cloud"
+       ondragover="cloudDragOver(event)" ondragleave="cloudDragLeave(event)" ondrop="cloudDrop(event)">
+    <div class="inbox-cloud-label">📥 Inbox — drag items to quadrants below</div>
+    <div id="cloud-items"></div>
+  </div>
+
+  <div class="matrix">
+    <div class="matrix-axis-top"><span>Urgent</span><span>Not Urgent</span></div>
+    <div class="quadrant q1" id="q-ui"
+         ondragover="qDragOver(event)" ondragleave="qDragLeave(event)" ondrop="qDrop(event,'ui')">
+      <div class="q-label">🔴 Do First — Urgent & Important</div>
+      <div class="q-items" id="qi-ui"></div>
+    </div>
+    <div class="quadrant q2" id="q-ni"
+         ondragover="qDragOver(event)" ondragleave="qDragLeave(event)" ondrop="qDrop(event,'ni')">
+      <div class="q-label">🟠 Schedule — Important & Not Urgent</div>
+      <div class="q-items" id="qi-ni"></div>
+    </div>
+    <div class="quadrant q3" id="q-un"
+         ondragover="qDragOver(event)" ondragleave="qDragLeave(event)" ondrop="qDrop(event,'un')">
+      <div class="q-label">⚪ Delegate — Urgent & Not Important</div>
+      <div class="q-items" id="qi-un"></div>
+    </div>
+    <div class="quadrant q4" id="q-nn"
+         ondragover="qDragOver(event)" ondragleave="qDragLeave(event)" ondrop="qDrop(event,'nn')">
+      <div class="q-label">⬜ Eliminate — Not Urgent & Not Important</div>
+      <div class="q-items" id="qi-nn"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN TO CALENDAR MODAL -->
+<div class="plan-modal-bg" id="plan-modal" onclick="if(event.target===this)closePlanModal()">
+  <div class="plan-modal">
+    <h3>📅 Add to Calendar</h3>
+    <div class="task-name" id="plan-task-name"></div>
+    <label>Time Slot</label>
+    <select id="plan-time"></select>
+    <div class="plan-modal-actions">
+      <button class="cancel" onclick="closePlanModal()">Cancel</button>
+      <button class="confirm" onclick="confirmPlan()">Add to Plan</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">Saved</div>
+
 <script>
-const STORE = 'dp_v11';
+const STORE = 'dp_v12';
+const INBOX_STORE = 'dp_inbox_v1';
 const SUPA_URL = 'https://zciwoergnubcqvamkltr.supabase.co';
 const SUPA_KEY = 'sb_publishable_VIJkNAYzWyS8hYknDXlQgw_fj08uQRF';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -130,7 +276,242 @@ let cur = new Date();
 let data = {};
 let syncStatus = 'offline';
 
-// Load: localStorage first (instant), then Supabase (async merge)
+// ===== INBOX DATA =====
+let inbox = { items: [], quadrants: { ui: [], ni: [], un: [], nn: [] } };
+let dragItem = null;
+let dragSource = null;
+let planTarget = null;
+
+function loadInbox() {
+  try { inbox = JSON.parse(localStorage.getItem(INBOX_STORE)) || { items: [], quadrants: { ui: [], ni: [], un: [], nn: [] } }; }
+  catch(e) { inbox = { items: [], quadrants: { ui: [], ni: [], un: [], nn: [] } }; }
+  if (!inbox.items) inbox.items = [];
+  if (!inbox.quadrants) inbox.quadrants = { ui: [], ni: [], un: [], nn: [] };
+  ['ui','ni','un','nn'].forEach(q => { if (!inbox.quadrants[q]) inbox.quadrants[q] = []; });
+  updateInboxBadge();
+  cloudLoadInbox();
+}
+
+function saveInbox() {
+  localStorage.setItem(INBOX_STORE, JSON.stringify(inbox));
+  updateInboxBadge();
+  // Debounced cloud save
+  clearTimeout(inboxCloudTimeout);
+  inboxCloudTimeout = setTimeout(cloudSaveInbox, 2000);
+}
+
+let inboxCloudTimeout;
+async function cloudLoadInbox() {
+  try {
+    const { data: row, error } = await sb.from('planner').select('data').eq('id', 'inbox').single();
+    if (row && row.data) {
+      const cloud = row.data;
+      // Merge: union items by text
+      if (cloud.items) {
+        const local = new Set(inbox.items);
+        cloud.items.forEach(i => local.add(i));
+        inbox.items = [...local];
+      }
+      if (cloud.quadrants) {
+        ['ui','ni','un','nn'].forEach(q => {
+          if (cloud.quadrants[q]) {
+            const local = new Set(inbox.quadrants[q]);
+            cloud.quadrants[q].forEach(i => local.add(i));
+            inbox.quadrants[q] = [...local];
+          }
+        });
+      }
+      saveInbox();
+    } else if (error && error.code === 'PGRST116') {
+      await sb.from('planner').insert({ id: 'inbox', data: inbox });
+    }
+  } catch(e) {}
+}
+
+async function cloudSaveInbox() {
+  try {
+    await sb.from('planner').upsert({ id: 'inbox', data: inbox, updated_at: new Date().toISOString() });
+  } catch(e) {}
+}
+
+function updateInboxBadge() {
+  const total = inbox.items.length +
+    Object.values(inbox.quadrants).reduce((s, a) => s + a.length, 0);
+  const el = document.getElementById('inbox-count');
+  if (el) { el.textContent = total; el.style.display = total > 0 ? '' : 'none'; }
+}
+
+function openInbox() {
+  document.getElementById('inbox-overlay').classList.add('open');
+  renderInbox();
+  document.getElementById('inbox-input').focus();
+}
+
+function closeInbox() {
+  document.getElementById('inbox-overlay').classList.remove('open');
+}
+
+function addInboxItem() {
+  const inp = document.getElementById('inbox-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inbox.items.push(text);
+  saveInbox();
+  inp.value = '';
+  renderInbox();
+  inp.focus();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.target.id === 'inbox-input' && e.key === 'Enter') {
+    e.preventDefault();
+    addInboxItem();
+  }
+});
+
+function removeInboxItem(idx) {
+  inbox.items.splice(idx, 1);
+  saveInbox();
+  renderInbox();
+}
+
+function removeQItem(q, idx) {
+  inbox.quadrants[q].splice(idx, 1);
+  saveInbox();
+  renderInbox();
+}
+
+function renderInbox() {
+  // Cloud items
+  const container = document.getElementById('cloud-items');
+  if (inbox.items.length === 0) {
+    container.innerHTML = '<div class="inbox-empty">No items yet — type above to brain dump!</div>';
+  } else {
+    container.innerHTML = inbox.items.map((item, i) =>
+      `<div class="cloud-item" draggable="true"
+            ondragstart="startDrag(event,'inbox',${i},'${esc(item)}')"
+            ondragend="endDrag(event)">
+        <span>${esc(item)}</span>
+        <span class="del" onclick="removeInboxItem(${i})">×</span>
+      </div>`
+    ).join('');
+  }
+
+  // Quadrant items
+  ['ui','ni','un','nn'].forEach(q => {
+    const el = document.getElementById('qi-' + q);
+    el.innerHTML = inbox.quadrants[q].map((item, i) =>
+      `<div class="q-item" draggable="true"
+            ondragstart="startDrag(event,'${q}',${i},'${esc(item)}')"
+            ondragend="endDrag(event)">
+        <span>${esc(item)}</span>
+        <div class="q-actions">
+          <button class="q-item-btn plan-btn" onclick="planItem('${esc(item)}','${q}',${i})" title="Add to calendar">📅</button>
+          <button class="q-item-btn del-btn" onclick="removeQItem('${q}',${i})" title="Remove">×</button>
+        </div>
+      </div>`
+    ).join('');
+  });
+
+  updateInboxBadge();
+}
+
+// ===== DRAG AND DROP =====
+function startDrag(e, source, idx, text) {
+  dragItem = text;
+  dragSource = { zone: source, idx: idx };
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', text);
+  e.target.style.opacity = '0.5';
+}
+
+function endDrag(e) {
+  e.target.style.opacity = '1';
+  dragItem = null;
+  dragSource = null;
+}
+
+function cloudDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function cloudDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function cloudDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragSource || dragSource.zone === 'inbox') return;
+  // Move from quadrant back to inbox
+  const text = inbox.quadrants[dragSource.zone][dragSource.idx];
+  inbox.quadrants[dragSource.zone].splice(dragSource.idx, 1);
+  inbox.items.push(text);
+  saveInbox();
+  renderInbox();
+}
+
+function qDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function qDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function qDrop(e, targetQ) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragSource) return;
+  let text;
+  if (dragSource.zone === 'inbox') {
+    text = inbox.items[dragSource.idx];
+    inbox.items.splice(dragSource.idx, 1);
+  } else {
+    text = inbox.quadrants[dragSource.zone][dragSource.idx];
+    inbox.quadrants[dragSource.zone].splice(dragSource.idx, 1);
+  }
+  inbox.quadrants[targetQ].push(text);
+  saveInbox();
+  renderInbox();
+}
+
+// ===== PLAN TO CALENDAR =====
+function planItem(text, q, idx) {
+  planTarget = { text: text.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>'), q, idx };
+  document.getElementById('plan-task-name').textContent = planTarget.text;
+  const sel = document.getElementById('plan-time');
+  let opts = '';
+  for (let h = 5; h <= 23; h++) {
+    for (let m = 0; m <= 30; m += 30) {
+      const sk = `${String(h).padStart(2,'0')}:${m === 0 ? '00' : '30'}`;
+      const dd = gd(dk(cur));
+      const existing = dd[sk] && dd[sk].p ? ` — ${dd[sk].p.substring(0,30)}` : '';
+      opts += `<option value="${sk}">${sk}${existing}</option>`;
+    }
+  }
+  sel.innerHTML = opts;
+  // Pre-select next empty slot around current time
+  const now = new Date();
+  for (let h = now.getHours(); h <= 23; h++) {
+    for (let m = 0; m <= 30; m += 30) {
+      const sk = `${String(h).padStart(2,'0')}:${m === 0 ? '00' : '30'}`;
+      const dd = gd(dk(cur));
+      if (!dd[sk] || !dd[sk].p) { sel.value = sk; break; }
+    }
+    if (sel.value) break;
+  }
+  document.getElementById('plan-modal').classList.add('open');
+}
+
+function closePlanModal() {
+  document.getElementById('plan-modal').classList.remove('open');
+  planTarget = null;
+}
+
+function confirmPlan() {
+  if (!planTarget) return;
+  const sk = document.getElementById('plan-time').value;
+  const key = dk(cur);
+  set(key, sk, 'p', planTarget.text);
+  // Remove from quadrant
+  inbox.quadrants[planTarget.q].splice(planTarget.idx, 1);
+  saveInbox();
+  renderInbox();
+  renderGrid();
+  closePlanModal();
+  toast('Added to plan!');
+}
+
+// ===== PLANNER DATA =====
 function load() {
   try { data = JSON.parse(localStorage.getItem(STORE) || '{}'); } catch(e) { data = {}; }
   cloudLoad();
@@ -140,20 +521,16 @@ async function cloudLoad() {
   try {
     const { data: row, error } = await sb.from('planner').select('data').eq('id', 'default').single();
     if (error && error.code === 'PGRST116') {
-      // No row yet — insert initial
       await sb.from('planner').insert({ id: 'default', data: data });
       syncStatus = 'synced';
     } else if (row) {
-      // Merge cloud data with local (cloud wins for conflicts)
       const cloud = row.data || {};
       Object.keys(cloud).forEach(k => {
         if (!data[k]) data[k] = cloud[k];
         else {
-          // Merge slots within each day
           Object.keys(cloud[k]).forEach(sk => {
             if (!data[k][sk]) data[k][sk] = cloud[k][sk];
             else {
-              // Keep whichever has more content
               const local = data[k][sk];
               const remote = cloud[k][sk];
               if ((remote.p && !local.p) || (remote.a && !local.a)) {
@@ -163,7 +540,6 @@ async function cloudLoad() {
           });
         }
       });
-      // Also push any local-only days to merged
       localStorage.setItem(STORE, JSON.stringify(data));
       syncStatus = 'synced';
     }
@@ -186,12 +562,17 @@ function updateSyncBadge() {
 let cloudTimeout;
 function save() {
   localStorage.setItem(STORE, JSON.stringify(data));
-  const t = document.getElementById('toast'); t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1200);
-  // Debounced cloud save
+  toast('Saved');
   clearTimeout(cloudTimeout);
   syncStatus = 'saving'; updateSyncBadge();
   cloudTimeout = setTimeout(cloudSave, 2000);
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || 'Saved';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1200);
 }
 
 async function cloudSave() {
@@ -205,7 +586,6 @@ async function cloudSave() {
 function dk(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function gd(k) { if (!data[k]) data[k] = {}; return data[k]; }
 function slotKey(h, m) { return `${String(h).padStart(2,'0')}:${m === 0 ? '00' : '30'}`; }
-
 function set(k, sk, f, v) { const d = gd(k); if (!d[sk]) d[sk] = { p: '', a: '' }; d[sk][f] = v; save(); }
 
 function renderNav() {
@@ -326,19 +706,21 @@ function exportMD() {
     }
   }
   navigator.clipboard.writeText(md);
-  const t = document.getElementById('toast'); t.textContent='Copied'; t.classList.add('show');
-  setTimeout(()=>{ t.classList.remove('show'); t.textContent='Saved'; }, 1500);
+  toast('Copied to clipboard');
 }
 
 document.addEventListener('keydown', e => {
-  if (e.target.tagName==='TEXTAREA') return;
+  if (e.target.tagName==='TEXTAREA' || e.target.tagName==='INPUT') return;
   if (e.key==='ArrowLeft') prevDay();
   if (e.key==='ArrowRight') nextDay();
   if (e.key==='t') goToday();
+  if (e.key==='i') openInbox();
+  if (e.key==='Escape') closeInbox();
 });
 
 // Init
 load();
+loadInbox();
 
 const tk = dk(new Date());
 if (!data[tk] || Object.keys(data[tk]).length === 0) {
@@ -360,8 +742,8 @@ if (!data[tk] || Object.keys(data[tk]).length === 0) {
     '14:00': { p: '💼 Intellect.io meeting (till 2:30)', a: '' },
     '14:30': { p: 'Day job', a: '' },
     '15:00': { p: 'PMO Task Tracking meeting (3:00-3:30)', a: '' },
-    '15:30': { p: '🎁 Gift for Andy + 📸 printed photos — Yishun Northpoint', a: '' },
-    '16:00': { p: '🎁 Errands at Yishun Northpoint', a: '' },
+    '15:30': { p: 'Day job', a: '' },
+    '16:00': { p: 'Day job', a: '' },
     '16:30': { p: 'Head home', a: '' },
     '17:00': { p: 'Day job', a: '' },
     '17:30': { p: 'Wrap up day job', a: '' },
@@ -371,7 +753,7 @@ if (!data[tk] || Object.keys(data[tk]).length === 0) {
     '19:30': { p: 'Dinner + family time', a: '' },
     '20:00': { p: '📞 Ventaz Sales — outreach (10 DMs)', a: '' },
     '20:30': { p: '📞 Ventaz Sales — follow-ups', a: '' },
-    '21:00': { p: '📞 Ventaz Sales — Ansell demo prep + demo call', a: '' },
+    '21:00': { p: '📞 Ventaz Sales — demo calls', a: '' },
     '21:30': { p: '🤖 Ventaz AI — daily standup', a: '' },
     '22:00': { p: '📞 Ventaz Sales — update CRM + pipeline', a: '' },
     '22:30': { p: 'Review day — fill in Actual column', a: '' },
