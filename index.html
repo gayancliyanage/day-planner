@@ -570,6 +570,8 @@
         </select>
       </div>
     </div>
+    <label>Phone</label>
+    <input id="pf-phone" placeholder="+65 6xxx xxxx">
     <div class="modal-row">
       <div><label>LinkedIn URL</label><input id="pf-linkedin" placeholder="linkedin.com/in/..."></div>
       <div><label>Email</label><input id="pf-email" placeholder="email@company.com"></div>
@@ -1620,16 +1622,22 @@ function renderDemos() {
   } else {
     filtered.forEach(p => {
       const statusLabel = { 'not-started':'Not Started', 'contacted':'Contacted', 'demo-booked':'Demo Booked', 'demo-done':'Demo Done ✅', 'no-response':'No Response' };
-      html += `<div class="prospect-card">
-        <div class="pc-left">
+      html += `<div class="prospect-card" style="flex-wrap:wrap;gap:6px">
+        <div class="pc-left" style="width:100%;flex:none">
           <span class="pc-company">${esc(p.company)}</span>
           <span class="pc-vertical">${esc(p.vertical||'')}</span>
-          ${p.contact ? `<span style="font-size:11px;color:var(--text-dim)">${esc(p.contact)}</span>` : ''}
+          <span class="pc-status ${p.status}">${statusLabel[p.status]||p.status}</span>
         </div>
-        <span class="pc-status ${p.status}">${statusLabel[p.status]||p.status}</span>
-        <div class="pc-actions">
+        ${p.phone ? `<div style="width:100%;display:flex;align-items:center;gap:6px">
+          <a href="tel:+65${p.phone.replace(/\s/g,'')}" style="font-size:13px;font-weight:700;color:var(--accent);text-decoration:none">📞 +65 ${esc(p.phone)}</a>
+          ${p.role ? `<span style="font-size:11px;color:var(--text-dim)">→ ${esc(p.role)}</span>` : ''}
+        </div>` : (p.role ? `<div style="width:100%;font-size:11px;color:var(--text-dim)">🎯 ${esc(p.role)}</div>` : '')}
+        ${p.contact ? `<div style="width:100%;font-size:11px;color:var(--text-dim)">👤 ${esc(p.contact)}</div>` : ''}
+        ${p.notes ? `<div style="width:100%;font-size:11px;color:var(--text-faint);line-height:1.4">${esc(p.notes)}</div>` : ''}
+        <div class="pc-actions" style="width:100%">
           <button class="pc-btn" onclick="editProspect(${p.id})">Edit</button>
-          <button class="pc-btn" onclick="quickStatusChange(${p.id})">→</button>
+          <button class="pc-btn" onclick="quickStatusChange(${p.id})">→ Next</button>
+          ${p.phone ? `<a class="pc-btn" href="tel:+65${p.phone.replace(/\s/g,'')}" style="text-decoration:none;text-align:center;color:var(--accent);border-color:var(--accent)">📞 Call</a>` : ''}
         </div>
       </div>`;
     });
@@ -1672,6 +1680,7 @@ function addProspect() {
   document.getElementById('prospect-modal-title').textContent = 'Add Prospect';
   document.getElementById('prospect-del-btn').style.display = 'none';
   ['pf-company','pf-contact','pf-role','pf-linkedin','pf-email','pf-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pf-phone').value = '';
   document.getElementById('pf-vertical').value = 'Healthcare';
   document.getElementById('pf-status').value = 'not-started';
   document.getElementById('pf-channel').value = 'LinkedIn';
@@ -1688,6 +1697,7 @@ function editProspect(id) {
   document.getElementById('pf-company').value = p.company || '';
   document.getElementById('pf-contact').value = p.contact || '';
   document.getElementById('pf-role').value = p.role || '';
+  document.getElementById('pf-phone').value = p.phone || '';
   document.getElementById('pf-vertical').value = p.vertical || 'Other';
   document.getElementById('pf-status').value = p.status || 'not-started';
   document.getElementById('pf-linkedin').value = p.linkedin || '';
@@ -1705,6 +1715,7 @@ function saveProspect() {
     company,
     contact: document.getElementById('pf-contact').value.trim(),
     role: document.getElementById('pf-role').value.trim(),
+    phone: document.getElementById('pf-phone').value.trim(),
     vertical: document.getElementById('pf-vertical').value,
     status: document.getElementById('pf-status').value,
     linkedin: document.getElementById('pf-linkedin').value.trim(),
