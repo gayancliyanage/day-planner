@@ -1400,27 +1400,41 @@ let demosVerticalFilter = 'all';
 let demosStatusFilter = 'all';
 
 async function loadDemos() {
-  // Supabase is source of truth — load from cloud first
-  try {
-    const { data: row, error } = await sb.from('planner').select('data').eq('id', 'demos').single();
-    if (row && row.data && row.data.prospects && row.data.prospects.length > 0) {
-      demos = row.data;
-      if (!demos.dailyLogs) demos.dailyLogs = [];
-      if (!demos.nextPId) demos.nextPId = 1;
-      localStorage.setItem(DEMOS_STORE, JSON.stringify(demos));
-      updateDemosBadge();
-      // Re-render if demos overlay is open
-      if (document.getElementById('demos-overlay').classList.contains('open')) renderDemos();
-      return;
-    }
-  } catch(e) {}
-  // Fallback to localStorage if cloud fails
+  // Start with localStorage as instant cache (no save triggered)
   try { demos = JSON.parse(localStorage.getItem(DEMOS_STORE)) || { dailyLogs: [], prospects: [], nextPId: 1 }; }
   catch(e) { demos = { dailyLogs: [], prospects: [], nextPId: 1 }; }
   if (!demos.dailyLogs) demos.dailyLogs = [];
   if (!demos.prospects) demos.prospects = [];
   if (!demos.nextPId) demos.nextPId = 1;
   updateDemosBadge();
+
+  // Then load from Supabase (source of truth) and overwrite
+  try {
+    const { data: row } = await sb.from('planner').select('data').eq('id', 'demos').single();
+    if (row && row.data) {
+      const cloud = row.data;
+      // Merge: cloud wins for prospects, merge daily logs by date
+      if (cloud.prospects && cloud.prospects.length > 0) {
+        const localMap = new Map(demos.prospects.map(p => [p.id, p]));
+        cloud.prospects.forEach(cp => {
+          const local = localMap.get(cp.id);
+          if (!local || cp.updatedAt >= (local.updatedAt || 0)) localMap.set(cp.id, cp);
+        });
+        // Also keep any local-only prospects not in cloud
+        demos.prospects = [...localMap.values()];
+      }
+      if (cloud.dailyLogs && cloud.dailyLogs.length > 0) {
+        const logMap = new Map(demos.dailyLogs.map(l => [l.date, l]));
+        cloud.dailyLogs.forEach(cl => logMap.set(cl.date, cl));
+        demos.dailyLogs = [...logMap.values()];
+      }
+      demos.nextPId = Math.max(demos.nextPId, cloud.nextPId || 1);
+      localStorage.setItem(DEMOS_STORE, JSON.stringify(demos));
+      updateDemosBadge();
+      // Re-render if demos overlay is open
+      if (document.getElementById('demos-overlay').classList.contains('open')) renderDemos();
+    }
+  } catch(e) { console.log('Demos cloud load error:', e); }
 }
 
 function saveDemos() {
@@ -1436,6 +1450,8 @@ async function cloudLoadDemos() {
 }
 
 async function cloudSaveDemos() {
+  // Never overwrite cloud with empty local data
+  if (!demos.prospects || demos.prospects.length === 0) return;
   try { await sb.from('planner').upsert({ id: 'demos', data: demos, updated_at: new Date().toISOString() }); } catch(e) {}
 }
 
