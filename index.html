@@ -1406,6 +1406,7 @@ let editingProspectId = null;
 let demosCloudTimeout;
 let demosVerticalFilter = 'all';
 let demosStatusFilter = 'all';
+let demosSegmentFilter = 'all';
 
 async function loadDemos() {
   // Start with localStorage as instant cache (no save triggered)
@@ -1612,11 +1613,18 @@ function renderDemos() {
   html += '</div>';
 
   // Prospect list
+  const smbCount = demos.prospects.filter(p => p.segment === 'smb').length;
+  const entCount = demos.prospects.length - smbCount;
   html += `<div class="prospect-section">
     <h3>📋 Prospects (${demos.prospects.length})</h3>
     <div class="prospect-filters">
+      <span class="prospect-filter${demosSegmentFilter==='all'?' active':''}" onclick="filterProspects('all','segment')">All (${demos.prospects.length})</span>
+      <span class="prospect-filter${demosSegmentFilter==='enterprise'?' active':''}" onclick="filterProspects('enterprise','segment')" style="border-color:#2c2c2c">🏢 Enterprise $2K (${entCount})</span>
+      <span class="prospect-filter${demosSegmentFilter==='smb'?' active':''}" onclick="filterProspects('smb','segment')" style="border-color:var(--accent)">🏪 SMB $599 (${smbCount})</span>
+    </div>
+    <div class="prospect-filters">
       <span class="prospect-filter${demosVerticalFilter==='all'?' active':''}" onclick="filterProspects('all','vertical')">All</span>
-      ${['Healthcare','Property','Insurance','Automotive','E-commerce','F&B','Fintech','Education','Travel','Telco','Home Services'].map(v =>
+      ${[...new Set(demos.prospects.map(p => p.vertical).filter(Boolean))].sort().map(v =>
         `<span class="prospect-filter${demosVerticalFilter===v?' active':''}" onclick="filterProspects('${v}','vertical')">${v}</span>`
       ).join('')}
     </div>
@@ -1631,6 +1639,8 @@ function renderDemos() {
     <div class="prospect-list">`;
 
   let filtered = demos.prospects;
+  if (demosSegmentFilter === 'smb') filtered = filtered.filter(p => p.segment === 'smb');
+  else if (demosSegmentFilter === 'enterprise') filtered = filtered.filter(p => !p.segment || p.segment !== 'smb');
   if (demosVerticalFilter !== 'all') filtered = filtered.filter(p => p.vertical === demosVerticalFilter);
   if (demosStatusFilter !== 'all') filtered = filtered.filter(p => p.status === demosStatusFilter);
   filtered.sort((a,b) => {
@@ -1677,7 +1687,8 @@ function renderDemos() {
 }
 
 function filterProspects(val, type) {
-  if (type === 'vertical') demosVerticalFilter = val;
+  if (type === 'segment') demosSegmentFilter = val;
+  else if (type === 'vertical') demosVerticalFilter = val;
   else demosStatusFilter = val;
   renderDemos();
 }
