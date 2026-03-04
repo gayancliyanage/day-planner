@@ -570,11 +570,13 @@
         </select>
       </div>
     </div>
-    <label>Phone</label>
-    <input id="pf-phone" placeholder="+65 6xxx xxxx">
     <div class="modal-row">
-      <div><label>LinkedIn URL</label><input id="pf-linkedin" placeholder="linkedin.com/in/..."></div>
+      <div><label>Phone</label><input id="pf-phone" placeholder="+65 6xxx xxxx"></div>
       <div><label>Email</label><input id="pf-email" placeholder="email@company.com"></div>
+    </div>
+    <div class="modal-row">
+      <div><label>Website</label><input id="pf-website" placeholder="https://..."></div>
+      <div><label>LinkedIn URL</label><input id="pf-linkedin" placeholder="linkedin.com/in/..."></div>
     </div>
     <div class="modal-row">
       <div><label>Outreach Channel</label>
@@ -1387,7 +1389,7 @@ if (crm.leads.length === 0) {
 }
 
 // ===== 100 DEMOS TRACKER =====
-const DEMOS_STORE = 'dp_demos_v3';
+const DEMOS_STORE = 'dp_demos_v4';
 const SPRINT_START = '2026-03-04';
 const SPRINT_END = '2026-06-02';
 const SPRINT_TARGET = 100;
@@ -1648,6 +1650,9 @@ function renderDemos() {
         ${p.email ? `<div style="width:100%">
           <a href="mailto:${esc(p.email)}" style="font-size:12px;color:var(--text-mid);text-decoration:none">✉️ ${esc(p.email)}</a>
         </div>` : ''}
+        ${p.website ? `<div style="width:100%">
+          <a href="${esc(p.website)}" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none">🌐 ${esc(p.website.replace(/^https?:\/\/(www\.)?/,''))}</a>
+        </div>` : ''}
         ${p.contact ? `<div style="width:100%;font-size:11px;color:var(--text-dim)">👤 ${esc(p.contact)}</div>` : ''}
         ${p.notes ? `<div style="width:100%;font-size:11px;color:var(--text-faint);line-height:1.4">${esc(p.notes)}</div>` : ''}
         <div class="pc-actions" style="width:100%">
@@ -1655,6 +1660,7 @@ function renderDemos() {
           <button class="pc-btn" onclick="quickStatusChange(${p.id})">→ Next</button>
           ${p.phone ? `<a class="pc-btn" href="tel:+65${p.phone.replace(/\s/g,'')}" style="text-decoration:none;text-align:center;color:var(--accent);border-color:var(--accent)">📞 Call</a>` : ''}
           ${p.email ? `<a class="pc-btn" href="mailto:${esc(p.email)}" style="text-decoration:none;text-align:center">✉️ Email</a>` : ''}
+          ${p.website ? `<a class="pc-btn" href="${esc(p.website)}" target="_blank" style="text-decoration:none;text-align:center">🌐 Web</a>` : ''}
         </div>
       </div>`;
     });
@@ -1698,6 +1704,7 @@ function addProspect() {
   document.getElementById('prospect-del-btn').style.display = 'none';
   ['pf-company','pf-contact','pf-role','pf-linkedin','pf-email','pf-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('pf-phone').value = '';
+  document.getElementById('pf-website').value = '';
   document.getElementById('pf-vertical').value = 'Healthcare';
   document.getElementById('pf-status').value = 'not-started';
   document.getElementById('pf-channel').value = 'LinkedIn';
@@ -1715,6 +1722,7 @@ function editProspect(id) {
   document.getElementById('pf-contact').value = p.contact || '';
   document.getElementById('pf-role').value = p.role || '';
   document.getElementById('pf-phone').value = p.phone || '';
+  document.getElementById('pf-website').value = p.website || '';
   document.getElementById('pf-vertical').value = p.vertical || 'Other';
   document.getElementById('pf-status').value = p.status || 'not-started';
   document.getElementById('pf-linkedin').value = p.linkedin || '';
@@ -1733,6 +1741,7 @@ function saveProspect() {
     contact: document.getElementById('pf-contact').value.trim(),
     role: document.getElementById('pf-role').value.trim(),
     phone: document.getElementById('pf-phone').value.trim(),
+    website: document.getElementById('pf-website').value.trim(),
     vertical: document.getElementById('pf-vertical').value,
     status: document.getElementById('pf-status').value,
     linkedin: document.getElementById('pf-linkedin').value.trim(),
