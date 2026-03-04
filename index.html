@@ -223,6 +223,109 @@
   .add-activity-row input { flex: 1; margin-bottom: 0; padding: 6px 8px; font-size: 11px; }
   .add-activity-row button { padding: 6px 10px; font-size: 11px; background: var(--text); color: var(--white); border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
 
+  /* ===== 100 DEMOS TRACKER ===== */
+  .demos-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 100; display: none; flex-direction: column; overflow: hidden; }
+  .demos-overlay.open { display: flex; }
+  .demos-top { padding: 20px 32px 0; display: flex; align-items: center; justify-content: space-between; }
+  .demos-top h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .demos-top-right { display: flex; gap: 8px; align-items: center; }
+  .demos-body { flex: 1; overflow-y: auto; padding: 16px 32px 40px; }
+
+  /* Sprint progress */
+  .sprint-header { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+  .sprint-stat { flex: 1; min-width: 120px; background: var(--surface); border-radius: 10px; padding: 14px 16px; }
+  .sprint-stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 4px; }
+  .sprint-stat-value { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+  .sprint-stat-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .sprint-stat-value.accent { color: var(--accent); }
+  .sprint-stat-value.success { color: var(--success); }
+
+  /* Progress bar */
+  .progress-section { margin-bottom: 24px; }
+  .progress-bar-outer { width: 100%; height: 24px; background: var(--surface); border-radius: 12px; overflow: hidden; position: relative; }
+  .progress-bar-inner { height: 100%; background: var(--text); border-radius: 12px; transition: width 0.5s ease; min-width: 2px; }
+  .progress-bar-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 11px; font-weight: 700; color: var(--text-dim); }
+  .progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; font-weight: 600; }
+
+  /* Weekly grid */
+  .week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 24px; }
+  .week-card { background: var(--surface); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
+  .week-card:hover { border-color: var(--accent); }
+  .week-card.current { border-color: var(--accent); background: rgba(196,107,46,0.06); }
+  .week-card.completed { border-color: var(--success); }
+  .week-card-title { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+  .week-card-dates { font-size: 10px; color: var(--text-dim); margin-bottom: 6px; }
+  .week-card-stats { display: flex; gap: 8px; font-size: 11px; font-weight: 600; }
+  .week-mini-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .week-mini-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
+
+  /* Daily log section */
+  .log-section { margin-bottom: 24px; }
+  .log-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .log-form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; background: var(--surface); padding: 14px; border-radius: 10px; }
+  .log-form input, .log-form select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: inherit; outline: none; }
+  .log-form input:focus, .log-form select:focus { border-color: var(--accent); }
+  .log-form input[type="number"] { width: 70px; }
+  .log-form select { width: 120px; }
+  .log-form button { background: var(--text); color: var(--white); border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .log-form button:hover { background: #333; }
+  .log-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .log-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--text); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+  .log-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-light); }
+  .log-table tr:hover { background: var(--surface); }
+  .log-del { cursor: pointer; color: var(--text-faint); font-size: 14px; }
+  .log-del:hover { color: var(--danger); }
+
+  /* Prospect section */
+  .prospect-section { margin-bottom: 24px; }
+  .prospect-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+  .prospect-filters { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .prospect-filter { padding: 5px 12px; border: 1px solid var(--border); border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--white); color: var(--text-mid); }
+  .prospect-filter.active { background: var(--text); color: var(--white); border-color: var(--text); }
+  .prospect-filter:hover:not(.active) { border-color: var(--accent); }
+  .prospect-list { display: flex; flex-direction: column; gap: 6px; }
+  .prospect-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; transition: all 0.15s; }
+  .prospect-card:hover { border-color: var(--accent); background: rgba(196,107,46,0.03); }
+  .prospect-card .pc-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .prospect-card .pc-company { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prospect-card .pc-vertical { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: var(--surface); color: var(--text-dim); font-weight: 600; white-space: nowrap; }
+  .prospect-card .pc-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .pc-status.not-started { background: var(--surface); color: var(--text-faint); }
+  .pc-status.contacted { background: rgba(196,107,46,0.1); color: var(--accent); }
+  .pc-status.demo-booked { background: rgba(39,174,96,0.1); color: var(--success); }
+  .pc-status.demo-done { background: rgba(0,0,0,0.08); color: var(--text); }
+  .pc-status.no-response { background: rgba(192,57,43,0.1); color: var(--danger); }
+  .prospect-card .pc-actions { display: flex; gap: 4px; }
+  .prospect-card .pc-btn { background: none; border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; color: var(--text-dim); }
+  .prospect-card .pc-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Funnel viz */
+  .funnel { display: flex; align-items: flex-end; gap: 4px; height: 100px; margin: 16px 0; }
+  .funnel-bar { flex: 1; background: var(--surface); border-radius: 4px 4px 0 0; position: relative; min-height: 4px; transition: height 0.3s; display: flex; align-items: flex-end; justify-content: center; }
+  .funnel-bar .fb-label { position: absolute; bottom: -20px; font-size: 9px; color: var(--text-dim); white-space: nowrap; text-align: center; width: 100%; }
+  .funnel-bar .fb-value { font-size: 11px; font-weight: 700; padding-bottom: 4px; }
+  .funnel-bar.f-outreach { background: var(--border); }
+  .funnel-bar.f-replied { background: var(--text-dim); color: var(--white); }
+  .funnel-bar.f-demos { background: var(--accent); color: var(--white); }
+  .funnel-bar.f-proposals { background: var(--text); color: var(--white); }
+  .funnel-bar.f-won { background: var(--success); color: var(--white); }
+
+  @media (max-width: 768px) {
+    .demos-overlay { padding-bottom: 56px; }
+    .demos-top { padding: 14px 16px 0; }
+    .demos-top h2 { font-size: 17px; }
+    .demos-body { padding: 12px 16px 70px; }
+    .sprint-header { gap: 8px; }
+    .sprint-stat { min-width: 90px; padding: 10px 12px; }
+    .sprint-stat-value { font-size: 20px; }
+    .week-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+    .log-form { flex-direction: column; }
+    .log-form input, .log-form select { width: 100%; }
+    .log-table { font-size: 11px; }
+    .log-table th, .log-table td { padding: 6px 8px; }
+    .prospect-card { flex-wrap: wrap; gap: 6px; }
+  }
+
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -350,6 +453,7 @@
   <button class="side-btn today-btn" onclick="goToday()">Today</button>
   <button class="side-btn inbox-btn" onclick="openInbox()">🧠 Smart Inbox <span class="badge" id="inbox-count">0</span></button>
   <button class="side-btn pipeline-btn" onclick="openCRM()">📊 Pipeline <span class="badge" id="pipeline-count">0</span></button>
+  <button class="side-btn pipeline-btn" onclick="openDemos()" style="border-color:var(--accent)!important;margin-bottom:12px">🎯 100 Demos <span class="badge" id="demos-count" style="background:var(--accent)">0</span></button>
   <div class="nav-scroll" id="sidebar-nav"></div>
 </div>
 
@@ -414,6 +518,82 @@
   <div class="crm-stats" id="crm-stats"></div>
   <div class="kanban" id="kanban"></div>
   <div class="crm-list" id="crm-list"></div>
+</div>
+
+<!-- 100 DEMOS TRACKER OVERLAY -->
+<div class="demos-overlay" id="demos-overlay">
+  <div class="demos-top">
+    <h2>🎯 100 Demos Sprint</h2>
+    <div class="demos-top-right">
+      <button class="export-btn" onclick="addProspect()">+ Add Prospect</button>
+      <button class="export-btn" onclick="exportDemosCSV()">Export CSV</button>
+      <button class="inbox-close" onclick="closeDemos()">← Back</button>
+    </div>
+  </div>
+  <div class="demos-body" id="demos-body"></div>
+</div>
+
+<!-- PROSPECT FORM MODAL -->
+<div class="modal-bg" id="prospect-modal" onclick="if(event.target===this)closeProspectModal()">
+  <div class="modal">
+    <h3 id="prospect-modal-title">Add Prospect</h3>
+    <label>Company</label>
+    <input id="pf-company" placeholder="Company name">
+    <div class="modal-row">
+      <div><label>Contact</label><input id="pf-contact" placeholder="Decision maker name"></div>
+      <div><label>Role</label><input id="pf-role" placeholder="e.g. Head of CX"></div>
+    </div>
+    <div class="modal-row">
+      <div><label>Vertical</label>
+        <select id="pf-vertical">
+          <option value="Healthcare">Healthcare</option>
+          <option value="Property">Property</option>
+          <option value="Insurance">Insurance</option>
+          <option value="Automotive">Automotive</option>
+          <option value="E-commerce">E-commerce</option>
+          <option value="F&B">F&B</option>
+          <option value="Fintech">Fintech</option>
+          <option value="Education">Education</option>
+          <option value="Travel">Travel</option>
+          <option value="Telco">Telco</option>
+          <option value="Home Services">Home Services</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div><label>Status</label>
+        <select id="pf-status">
+          <option value="not-started">Not Started</option>
+          <option value="contacted">Contacted</option>
+          <option value="demo-booked">Demo Booked</option>
+          <option value="demo-done">Demo Done</option>
+          <option value="no-response">No Response</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div><label>LinkedIn URL</label><input id="pf-linkedin" placeholder="linkedin.com/in/..."></div>
+      <div><label>Email</label><input id="pf-email" placeholder="email@company.com"></div>
+    </div>
+    <div class="modal-row">
+      <div><label>Outreach Channel</label>
+        <select id="pf-channel">
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Email">Email</option>
+          <option value="Cold Call">Cold Call</option>
+          <option value="Referral">Referral</option>
+          <option value="Event">Event</option>
+        </select>
+      </div>
+      <div><label>Demo Date</label><input id="pf-demo-date" type="date"></div>
+    </div>
+    <label>Notes</label>
+    <textarea id="pf-notes" placeholder="Any context..."></textarea>
+    <div class="modal-actions">
+      <button class="danger" id="prospect-del-btn" style="display:none;margin-right:auto" onclick="deleteProspect()">Delete</button>
+      <button class="cancel" onclick="closeProspectModal()">Cancel</button>
+      <button class="confirm" onclick="saveProspect()">Save</button>
+    </div>
+  </div>
 </div>
 
 <!-- LEAD FORM MODAL -->
@@ -504,6 +684,10 @@
     <span class="nav-icon">📊</span>Pipeline
     <span class="nav-badge" id="m-pipeline-count" style="display:none">0</span>
   </button>
+  <button onclick="mobileTab('demos')" id="mtab-demos" style="position:relative">
+    <span class="nav-icon">🎯</span>Demos
+    <span class="nav-badge" id="m-demos-count" style="display:none">0</span>
+  </button>
 </div>
 
 <!-- MOBILE MOVE BAR (touch alternative to drag) -->
@@ -556,7 +740,7 @@ let appInitialized = false;
 function initApp() {
   if (appInitialized) return;
   appInitialized = true;
-  load(); loadInbox(); loadCRM();
+  load(); loadInbox(); loadCRM(); loadDemos();
   const tk = dk(new Date());
   if (!data[tk] || Object.keys(data[tk]).length === 0) { seedToday(); }
   renderNav(); renderGrid();
@@ -1136,7 +1320,8 @@ document.addEventListener('keydown', e => {
   if (e.target.tagName==='TEXTAREA' || e.target.tagName==='INPUT') return;
   if (e.key==='ArrowLeft') prevDay(); if (e.key==='ArrowRight') nextDay();
   if (e.key==='t') goToday(); if (e.key==='i') openInbox(); if (e.key==='p') openCRM();
-  if (e.key==='Escape') { closeInbox(); closeCRM(); closeLeadModal(); closePlanModal(); }
+  if (e.key==='d') openDemos();
+  if (e.key==='Escape') { closeInbox(); closeCRM(); closeDemos(); closeLeadModal(); closePlanModal(); closeProspectModal(); }
 });
 
 document.addEventListener('keydown', e => {
@@ -1199,13 +1384,395 @@ if (crm.leads.length === 0) {
   saveCRM();
 }
 
+// ===== 100 DEMOS TRACKER =====
+const DEMOS_STORE = 'dp_demos_v1';
+const SPRINT_START = '2026-03-04';
+const SPRINT_END = '2026-06-02';
+const SPRINT_TARGET = 100;
+const WEEKLY_TARGET = 8;
+
+let demos = { dailyLogs: [], prospects: [], nextPId: 1 };
+let editingProspectId = null;
+let demosCloudTimeout;
+let demosVerticalFilter = 'all';
+let demosStatusFilter = 'all';
+
+function loadDemos() {
+  try { demos = JSON.parse(localStorage.getItem(DEMOS_STORE)) || { dailyLogs: [], prospects: [], nextPId: 1 }; }
+  catch(e) { demos = { dailyLogs: [], prospects: [], nextPId: 1 }; }
+  if (!demos.dailyLogs) demos.dailyLogs = [];
+  if (!demos.prospects) demos.prospects = [];
+  if (!demos.nextPId) demos.nextPId = 1;
+  updateDemosBadge();
+  cloudLoadDemos();
+}
+
+function saveDemos() {
+  localStorage.setItem(DEMOS_STORE, JSON.stringify(demos));
+  updateDemosBadge();
+  clearTimeout(demosCloudTimeout);
+  demosCloudTimeout = setTimeout(cloudSaveDemos, 2000);
+}
+
+async function cloudLoadDemos() {
+  try {
+    const { data: row, error } = await sb.from('planner').select('data').eq('id', 'demos').single();
+    if (row && row.data) {
+      const cloud = row.data;
+      if (cloud.dailyLogs && cloud.dailyLogs.length > demos.dailyLogs.length) demos.dailyLogs = cloud.dailyLogs;
+      if (cloud.prospects) {
+        const localMap = new Map(demos.prospects.map(p => [p.id, p]));
+        cloud.prospects.forEach(cp => {
+          if (!localMap.has(cp.id)) demos.prospects.push(cp);
+          else if (cp.updatedAt > (localMap.get(cp.id).updatedAt || 0)) localMap.set(cp.id, cp);
+        });
+        demos.prospects = [...localMap.values()];
+      }
+      demos.nextPId = Math.max(demos.nextPId, cloud.nextPId || 1);
+      saveDemos();
+    } else if (error && error.code === 'PGRST116') {
+      await sb.from('planner').insert({ id: 'demos', data: demos });
+    }
+  } catch(e) {}
+}
+
+async function cloudSaveDemos() {
+  try { await sb.from('planner').upsert({ id: 'demos', data: demos, updated_at: new Date().toISOString() }); } catch(e) {}
+}
+
+function updateDemosBadge() {
+  const total = demos.prospects.filter(p => p.status === 'demo-done').length;
+  ['demos-count', 'm-demos-count'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = total + '/' + SPRINT_TARGET; el.style.display = ''; }
+  });
+}
+
+function getSprintWeek(dateStr) {
+  const d = new Date(dateStr || new Date().toISOString().slice(0,10));
+  const start = new Date(SPRINT_START);
+  const diff = Math.floor((d - start) / (7 * 24 * 60 * 60 * 1000));
+  return Math.max(0, Math.min(12, diff));
+}
+
+function getWeekDates(weekNum) {
+  const start = new Date(SPRINT_START);
+  start.setDate(start.getDate() + weekNum * 7);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  return { start: start.toISOString().slice(0,10), end: end.toISOString().slice(0,10) };
+}
+
+function openDemos() {
+  document.getElementById('demos-overlay').classList.add('open');
+  renderDemos();
+}
+function closeDemos() { document.getElementById('demos-overlay').classList.remove('open'); }
+
+function renderDemos() {
+  const body = document.getElementById('demos-body');
+  const today = new Date().toISOString().slice(0,10);
+  const currentWeek = getSprintWeek(today);
+
+  // Aggregate stats
+  const totalDemos = demos.prospects.filter(p => p.status === 'demo-done').length;
+  const demosBooked = demos.prospects.filter(p => p.status === 'demo-booked').length;
+  const totalOutreach = demos.dailyLogs.reduce((s,l) => s + (l.linkedin||0) + (l.emails||0) + (l.calls||0), 0);
+  const totalReplies = demos.dailyLogs.reduce((s,l) => s + (l.replies||0), 0);
+  const contacted = demos.prospects.filter(p => p.status !== 'not-started').length;
+  const noResponse = demos.prospects.filter(p => p.status === 'no-response').length;
+  const daysElapsed = Math.max(1, Math.floor((new Date(today) - new Date(SPRINT_START)) / (1000*60*60*24)) + 1);
+  const daysTotal = Math.floor((new Date(SPRINT_END) - new Date(SPRINT_START)) / (1000*60*60*24));
+  const paceNeeded = daysElapsed > 0 ? ((SPRINT_TARGET - totalDemos) / Math.max(1, daysTotal - daysElapsed) * 7).toFixed(1) : WEEKLY_TARGET;
+
+  let html = '';
+
+  // Sprint stats
+  html += `<div class="sprint-header">
+    <div class="sprint-stat"><div class="sprint-stat-label">Demos Done</div>
+      <div class="sprint-stat-value accent">${totalDemos}</div>
+      <div class="sprint-stat-sub">of ${SPRINT_TARGET} target</div></div>
+    <div class="sprint-stat"><div class="sprint-stat-label">Booked</div>
+      <div class="sprint-stat-value">${demosBooked}</div>
+      <div class="sprint-stat-sub">upcoming demos</div></div>
+    <div class="sprint-stat"><div class="sprint-stat-label">Outreach</div>
+      <div class="sprint-stat-value">${totalOutreach}</div>
+      <div class="sprint-stat-sub">${totalReplies} replies (${totalOutreach > 0 ? Math.round(totalReplies/totalOutreach*100) : 0}%)</div></div>
+    <div class="sprint-stat"><div class="sprint-stat-label">Week ${currentWeek + 1}/13</div>
+      <div class="sprint-stat-value">${paceNeeded}</div>
+      <div class="sprint-stat-sub">demos/week needed</div></div>
+    <div class="sprint-stat"><div class="sprint-stat-label">Prospects</div>
+      <div class="sprint-stat-value">${demos.prospects.length}</div>
+      <div class="sprint-stat-sub">${contacted} contacted</div></div>
+  </div>`;
+
+  // Progress bar
+  const pct = Math.min(100, Math.round(totalDemos / SPRINT_TARGET * 100));
+  const expectedPct = Math.min(100, Math.round(daysElapsed / daysTotal * 100));
+  html += `<div class="progress-section">
+    <div class="progress-label"><span>Progress</span><span>${totalDemos}/${SPRINT_TARGET} demos (${pct}%)</span></div>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" style="width:${pct}%;background:${pct >= expectedPct ? 'var(--success)' : 'var(--accent)'}"></div>
+      <div class="progress-bar-text">${pct >= expectedPct ? '✅ On track' : '⚠️ Behind pace'}</div>
+    </div>
+  </div>`;
+
+  // Conversion funnel
+  const maxF = Math.max(totalOutreach, 1);
+  html += `<div style="margin-bottom:24px">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:8px">Conversion Funnel</h3>
+    <div class="funnel">
+      <div class="funnel-bar f-outreach" style="height:${Math.max(8, totalOutreach/maxF*100)}%"><span class="fb-value">${totalOutreach}</span><span class="fb-label">Outreach</span></div>
+      <div class="funnel-bar f-replied" style="height:${Math.max(8, totalReplies/maxF*100)}%"><span class="fb-value">${totalReplies}</span><span class="fb-label">Replies</span></div>
+      <div class="funnel-bar f-demos" style="height:${Math.max(8, (totalDemos+demosBooked)/maxF*100)}%"><span class="fb-value">${totalDemos + demosBooked}</span><span class="fb-label">Demos</span></div>
+      <div class="funnel-bar f-proposals" style="height:${Math.max(8, 0)}%"><span class="fb-value">—</span><span class="fb-label">Proposals</span></div>
+      <div class="funnel-bar f-won" style="height:${Math.max(8, 0)}%"><span class="fb-value">—</span><span class="fb-label">Won</span></div>
+    </div>
+  </div>`;
+
+  // Weekly grid
+  html += `<div style="margin-bottom:8px"><h3 style="font-size:14px;font-weight:700">Weekly Breakdown</h3></div>
+    <div class="week-grid">`;
+  for (let w = 0; w < 13; w++) {
+    const wd = getWeekDates(w);
+    const weekDemos = demos.prospects.filter(p => p.status === 'demo-done' && p.demoDate && p.demoDate >= wd.start && p.demoDate <= wd.end).length;
+    const weekOutreach = demos.dailyLogs.filter(l => l.date >= wd.start && l.date <= wd.end).reduce((s,l) => s + (l.linkedin||0) + (l.emails||0) + (l.calls||0), 0);
+    const isCurrent = w === currentWeek;
+    const isComplete = today > wd.end;
+    const fillPct = Math.min(100, Math.round(weekDemos / WEEKLY_TARGET * 100));
+
+    html += `<div class="week-card${isCurrent ? ' current' : ''}${isComplete && weekDemos >= WEEKLY_TARGET ? ' completed' : ''}">
+      <div class="week-card-title">Week ${w + 1}</div>
+      <div class="week-card-dates">${wd.start.slice(5)} → ${wd.end.slice(5)}</div>
+      <div class="week-card-stats">
+        <span style="color:var(--accent)">${weekDemos}/${WEEKLY_TARGET} demos</span>
+        <span style="color:var(--text-dim)">${weekOutreach} touches</span>
+      </div>
+      <div class="week-mini-bar"><div class="week-mini-fill" style="width:${fillPct}%"></div></div>
+    </div>`;
+  }
+  html += '</div>';
+
+  // Daily activity log
+  html += `<div class="log-section">
+    <h3>📝 Daily Activity Log</h3>
+    <div class="log-form">
+      <input id="log-date" type="date" value="${today}">
+      <input id="log-linkedin" type="number" placeholder="LinkedIn" min="0" value="0">
+      <input id="log-emails" type="number" placeholder="Emails" min="0" value="0">
+      <input id="log-calls" type="number" placeholder="Calls" min="0" value="0">
+      <input id="log-replies" type="number" placeholder="Replies" min="0" value="0">
+      <input id="log-demos-done" type="number" placeholder="Demos" min="0" value="0">
+      <input id="log-note" type="text" placeholder="Notes..." style="flex:1;min-width:120px">
+      <button onclick="addDailyLog()">Log Activity</button>
+    </div>`;
+
+  // Show recent logs
+  const recentLogs = demos.dailyLogs.slice().sort((a,b) => b.date.localeCompare(a.date)).slice(0, 14);
+  if (recentLogs.length > 0) {
+    html += `<table class="log-table"><thead><tr>
+      <th>Date</th><th>LinkedIn</th><th>Emails</th><th>Calls</th><th>Replies</th><th>Demos</th><th>Notes</th><th></th>
+    </tr></thead><tbody>`;
+    recentLogs.forEach((l, i) => {
+      const total = (l.linkedin||0) + (l.emails||0) + (l.calls||0);
+      html += `<tr>
+        <td>${l.date}</td><td>${l.linkedin||0}</td><td>${l.emails||0}</td><td>${l.calls||0}</td>
+        <td>${l.replies||0}</td><td>${l.demosCompleted||0}</td>
+        <td>${esc(l.note||'')}</td>
+        <td><span class="log-del" onclick="deleteDailyLog('${l.date}')">×</span></td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--text-faint);padding:8px 0">No activity logged yet. Start your outreach!</div>';
+  }
+  html += '</div>';
+
+  // Prospect list
+  html += `<div class="prospect-section">
+    <h3>📋 Prospects (${demos.prospects.length})</h3>
+    <div class="prospect-filters">
+      <span class="prospect-filter${demosVerticalFilter==='all'?' active':''}" onclick="filterProspects('all','vertical')">All</span>
+      ${['Healthcare','Property','Insurance','Automotive','E-commerce','F&B','Fintech','Education','Travel','Telco','Home Services'].map(v =>
+        `<span class="prospect-filter${demosVerticalFilter===v?' active':''}" onclick="filterProspects('${v}','vertical')">${v}</span>`
+      ).join('')}
+    </div>
+    <div class="prospect-filters" style="margin-top:0">
+      <span class="prospect-filter${demosStatusFilter==='all'?' active':''}" onclick="filterProspects('all','status')">All Status</span>
+      <span class="prospect-filter${demosStatusFilter==='not-started'?' active':''}" onclick="filterProspects('not-started','status')">Not Started</span>
+      <span class="prospect-filter${demosStatusFilter==='contacted'?' active':''}" onclick="filterProspects('contacted','status')">Contacted</span>
+      <span class="prospect-filter${demosStatusFilter==='demo-booked'?' active':''}" onclick="filterProspects('demo-booked','status')">Demo Booked</span>
+      <span class="prospect-filter${demosStatusFilter==='demo-done'?' active':''}" onclick="filterProspects('demo-done','status')">Demo Done</span>
+      <span class="prospect-filter${demosStatusFilter==='no-response'?' active':''}" onclick="filterProspects('no-response','status')">No Response</span>
+    </div>
+    <div class="prospect-list">`;
+
+  let filtered = demos.prospects;
+  if (demosVerticalFilter !== 'all') filtered = filtered.filter(p => p.vertical === demosVerticalFilter);
+  if (demosStatusFilter !== 'all') filtered = filtered.filter(p => p.status === demosStatusFilter);
+  filtered.sort((a,b) => {
+    const order = { 'demo-booked': 0, 'contacted': 1, 'not-started': 2, 'no-response': 3, 'demo-done': 4 };
+    return (order[a.status]||9) - (order[b.status]||9);
+  });
+
+  if (filtered.length === 0) {
+    html += '<div style="font-size:12px;color:var(--text-faint);padding:16px 0;text-align:center">No prospects yet. Click "+ Add Prospect" to start building your list.</div>';
+  } else {
+    filtered.forEach(p => {
+      const statusLabel = { 'not-started':'Not Started', 'contacted':'Contacted', 'demo-booked':'Demo Booked', 'demo-done':'Demo Done ✅', 'no-response':'No Response' };
+      html += `<div class="prospect-card">
+        <div class="pc-left">
+          <span class="pc-company">${esc(p.company)}</span>
+          <span class="pc-vertical">${esc(p.vertical||'')}</span>
+          ${p.contact ? `<span style="font-size:11px;color:var(--text-dim)">${esc(p.contact)}</span>` : ''}
+        </div>
+        <span class="pc-status ${p.status}">${statusLabel[p.status]||p.status}</span>
+        <div class="pc-actions">
+          <button class="pc-btn" onclick="editProspect(${p.id})">Edit</button>
+          <button class="pc-btn" onclick="quickStatusChange(${p.id})">→</button>
+        </div>
+      </div>`;
+    });
+  }
+  html += '</div></div>';
+
+  body.innerHTML = html;
+}
+
+function filterProspects(val, type) {
+  if (type === 'vertical') demosVerticalFilter = val;
+  else demosStatusFilter = val;
+  renderDemos();
+}
+
+function addDailyLog() {
+  const date = document.getElementById('log-date').value;
+  if (!date) return;
+  // Remove existing log for this date
+  demos.dailyLogs = demos.dailyLogs.filter(l => l.date !== date);
+  demos.dailyLogs.push({
+    date,
+    linkedin: parseInt(document.getElementById('log-linkedin').value) || 0,
+    emails: parseInt(document.getElementById('log-emails').value) || 0,
+    calls: parseInt(document.getElementById('log-calls').value) || 0,
+    replies: parseInt(document.getElementById('log-replies').value) || 0,
+    demosCompleted: parseInt(document.getElementById('log-demos-done').value) || 0,
+    note: document.getElementById('log-note').value.trim()
+  });
+  saveDemos(); renderDemos(); toast('Activity logged');
+}
+
+function deleteDailyLog(date) {
+  demos.dailyLogs = demos.dailyLogs.filter(l => l.date !== date);
+  saveDemos(); renderDemos();
+}
+
+function addProspect() {
+  editingProspectId = null;
+  document.getElementById('prospect-modal-title').textContent = 'Add Prospect';
+  document.getElementById('prospect-del-btn').style.display = 'none';
+  ['pf-company','pf-contact','pf-role','pf-linkedin','pf-email','pf-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pf-vertical').value = 'Healthcare';
+  document.getElementById('pf-status').value = 'not-started';
+  document.getElementById('pf-channel').value = 'LinkedIn';
+  document.getElementById('pf-demo-date').value = '';
+  document.getElementById('prospect-modal').classList.add('open');
+}
+
+function editProspect(id) {
+  const p = demos.prospects.find(x => x.id === id);
+  if (!p) return;
+  editingProspectId = id;
+  document.getElementById('prospect-modal-title').textContent = 'Edit Prospect';
+  document.getElementById('prospect-del-btn').style.display = '';
+  document.getElementById('pf-company').value = p.company || '';
+  document.getElementById('pf-contact').value = p.contact || '';
+  document.getElementById('pf-role').value = p.role || '';
+  document.getElementById('pf-vertical').value = p.vertical || 'Other';
+  document.getElementById('pf-status').value = p.status || 'not-started';
+  document.getElementById('pf-linkedin').value = p.linkedin || '';
+  document.getElementById('pf-email').value = p.email || '';
+  document.getElementById('pf-channel').value = p.channel || 'LinkedIn';
+  document.getElementById('pf-demo-date').value = p.demoDate || '';
+  document.getElementById('pf-notes').value = p.notes || '';
+  document.getElementById('prospect-modal').classList.add('open');
+}
+
+function saveProspect() {
+  const company = document.getElementById('pf-company').value.trim();
+  if (!company) { toast('Company name required'); return; }
+  const pData = {
+    company,
+    contact: document.getElementById('pf-contact').value.trim(),
+    role: document.getElementById('pf-role').value.trim(),
+    vertical: document.getElementById('pf-vertical').value,
+    status: document.getElementById('pf-status').value,
+    linkedin: document.getElementById('pf-linkedin').value.trim(),
+    email: document.getElementById('pf-email').value.trim(),
+    channel: document.getElementById('pf-channel').value,
+    demoDate: document.getElementById('pf-demo-date').value,
+    notes: document.getElementById('pf-notes').value.trim(),
+    updatedAt: Date.now()
+  };
+  if (editingProspectId) {
+    const p = demos.prospects.find(x => x.id === editingProspectId);
+    if (p) Object.assign(p, pData);
+  } else {
+    pData.id = demos.nextPId++;
+    pData.createdAt = new Date().toISOString().slice(0,10);
+    demos.prospects.push(pData);
+  }
+  saveDemos(); closeProspectModal(); renderDemos();
+  toast(editingProspectId ? 'Prospect updated' : 'Prospect added');
+}
+
+function deleteProspect() {
+  if (!editingProspectId || !confirm('Delete this prospect?')) return;
+  demos.prospects = demos.prospects.filter(p => p.id !== editingProspectId);
+  saveDemos(); closeProspectModal(); renderDemos(); toast('Prospect deleted');
+}
+
+function closeProspectModal() {
+  document.getElementById('prospect-modal').classList.remove('open');
+  editingProspectId = null;
+}
+
+function quickStatusChange(id) {
+  const p = demos.prospects.find(x => x.id === id);
+  if (!p) return;
+  const flow = ['not-started', 'contacted', 'demo-booked', 'demo-done'];
+  const idx = flow.indexOf(p.status);
+  if (idx < flow.length - 1) {
+    p.status = flow[idx + 1];
+    if (p.status === 'demo-done' && !p.demoDate) p.demoDate = new Date().toISOString().slice(0,10);
+    p.updatedAt = Date.now();
+    saveDemos(); renderDemos();
+    const labels = { 'contacted':'Contacted', 'demo-booked':'Demo Booked', 'demo-done':'Demo Done! 🎉' };
+    toast(labels[p.status] || p.status);
+  }
+}
+
+function exportDemosCSV() {
+  let csv = 'Company,Contact,Role,Vertical,Status,Channel,Email,LinkedIn,Demo Date,Notes\n';
+  demos.prospects.forEach(p => {
+    csv += [p.company,p.contact,p.role,p.vertical,p.status,p.channel,p.email,p.linkedin,p.demoDate,p.notes].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '100-demos-prospects.csv';
+  a.click();
+  toast('CSV exported');
+}
+
 // ===== MOBILE TAB NAVIGATION =====
 function mobileTab(tab) {
   document.querySelectorAll('.mobile-nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('mtab-' + tab).classList.add('active');
-  closeInbox(); closeCRM();
+  closeInbox(); closeCRM(); closeDemos();
   if (tab === 'inbox') openInbox();
   else if (tab === 'pipeline') openCRM();
+  else if (tab === 'demos') openDemos();
 }
 
 // ===== MOBILE SWIPE GESTURES =====
