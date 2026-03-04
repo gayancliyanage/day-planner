@@ -1399,72 +1399,40 @@ let demosCloudTimeout;
 let demosVerticalFilter = 'all';
 let demosStatusFilter = 'all';
 
-function loadDemos() {
+async function loadDemos() {
+  // Supabase is source of truth — load from cloud first
+  try {
+    const { data: row, error } = await sb.from('planner').select('data').eq('id', 'demos').single();
+    if (row && row.data && row.data.prospects && row.data.prospects.length > 0) {
+      demos = row.data;
+      if (!demos.dailyLogs) demos.dailyLogs = [];
+      if (!demos.nextPId) demos.nextPId = 1;
+      localStorage.setItem(DEMOS_STORE, JSON.stringify(demos));
+      updateDemosBadge();
+      // Re-render if demos overlay is open
+      if (document.getElementById('demos-overlay').classList.contains('open')) renderDemos();
+      return;
+    }
+  } catch(e) {}
+  // Fallback to localStorage if cloud fails
   try { demos = JSON.parse(localStorage.getItem(DEMOS_STORE)) || { dailyLogs: [], prospects: [], nextPId: 1 }; }
   catch(e) { demos = { dailyLogs: [], prospects: [], nextPId: 1 }; }
   if (!demos.dailyLogs) demos.dailyLogs = [];
   if (!demos.prospects) demos.prospects = [];
   if (!demos.nextPId) demos.nextPId = 1;
   updateDemosBadge();
-  // Seed prospects if empty
-  if (demos.prospects.length === 0) {
-    const seeds = [
-      { company:'Q&M Dental Group', vertical:'Healthcare', role:'Operations Manager', phone:'6358 1098', notes:'100+ clinics. Massive appointment volume. SGX-listed.', channel:'Cold Call' },
-      { company:'Healthway Medical', vertical:'Healthcare', role:'Operations Manager', phone:'6977 6633', notes:'130+ clinics. WhatsApp: 9633 9599. SGX-listed.', channel:'Cold Call' },
-      { company:'Raffles Medical Group', vertical:'Healthcare', role:'VP Operations', phone:'6535 5965', notes:'100+ clinics + hospital. SGX-listed, 3000+ staff.', channel:'Cold Call' },
-      { company:'Doctor Anywhere', vertical:'Healthcare', role:'Head of Ops/CX', phone:'3158 4622', notes:'Telehealth, 2.8M+ users. Digital-first.', channel:'Cold Call' },
-      { company:'Fullerton Health', vertical:'Healthcare', role:'Head of Clinic Ops', phone:'6333 3636', notes:'Corporate clinics network. Marina Square.', channel:'Cold Call' },
-      { company:'PropNex', vertical:'Property', role:'Head of Tech/Digital', phone:'6820 8000', notes:'Largest SG agency, 12K+ agents. SGX-listed.', channel:'Cold Call' },
-      { company:'ERA Singapore', vertical:'Property', role:'Operations Manager', phone:'6226 2000', notes:'8K+ agents. Mountbatten Square.', channel:'Cold Call' },
-      { company:'OrangeTee & Tie', vertical:'Property', role:'Head of Operations', phone:'6471 8888', notes:'4K agents. Toa Payoh.', channel:'Cold Call' },
-      { company:'Cycle & Carriage', vertical:'Automotive', role:'CX Manager', phone:'6471 9111', notes:'Mercedes, Mitsubishi. Jardine group.', channel:'Cold Call' },
-      { company:'Borneo Motors', vertical:'Automotive', role:'Head of Customer Service', phone:'6631 1111', notes:'Toyota SG distributor.', channel:'Cold Call' },
-      { company:'Tan Chong Motor', vertical:'Automotive', role:'Customer Service Head', phone:'6466 7711', notes:'Nissan, Subaru. Bukit Timah Rd.', channel:'Cold Call' },
-      { company:'FWD Insurance', vertical:'Insurance', role:'Head of Digital/CX', phone:'6727 5700', notes:'Digital-first insurer. Suntec Tower Four.', channel:'Cold Call' },
-      { company:'Income Insurance', vertical:'Insurance', role:'VP Operations', phone:'6788 1777', notes:'3M+ customers. Bras Basah.', channel:'Cold Call' },
-      { company:'Great Eastern', vertical:'Insurance', role:'Head of CX', phone:'6248 2000', notes:'Largest SG insurer. OCBC subsidiary.', channel:'Cold Call' },
-      { company:'DirectAsia', vertical:'Insurance', role:'Head of Operations', phone:'6532 2888', notes:'Online car insurance. Smaller = easier close.', channel:'Cold Call' },
-      { company:'Ninja Van', vertical:'E-commerce', role:'VP Ops/CX Director', phone:'6602 8271', notes:'SG-HQ logistics unicorn. "Where is my package" calls.', channel:'Cold Call' },
-      { company:'ComfortDelGro', vertical:'Other', role:'Head of CX', phone:'6383 8833', notes:'Taxi/transport bookings. SGX-listed.', channel:'Cold Call' },
-      { company:'Circles.Life', vertical:'Telco', role:'Head of CX', phone:'', notes:'Digital telco, no phone. Try LinkedIn.', channel:'LinkedIn' },
-      { company:'Kumon Singapore', vertical:'Education', role:'Head of Ops SG', phone:'', notes:'100+ centres. Enrollment calls.', channel:'LinkedIn' },
-      { company:'MindChamps', vertical:'Education', role:'Enrollment Manager', phone:'', notes:'SGX-listed preschool chain.', channel:'LinkedIn' },
-    ];
-    seeds.forEach(s => {
-      demos.prospects.push({ id: demos.nextPId++, ...s, contact:'', status:'not-started', linkedin:'', email:'', demoDate:'', createdAt:'2026-03-04', updatedAt: Date.now() });
-    });
-    saveDemos();
-  }
-  cloudLoadDemos();
 }
 
 function saveDemos() {
   localStorage.setItem(DEMOS_STORE, JSON.stringify(demos));
   updateDemosBadge();
   clearTimeout(demosCloudTimeout);
-  demosCloudTimeout = setTimeout(cloudSaveDemos, 2000);
+  demosCloudTimeout = setTimeout(cloudSaveDemos, 1000);
 }
 
 async function cloudLoadDemos() {
-  try {
-    const { data: row, error } = await sb.from('planner').select('data').eq('id', 'demos').single();
-    if (row && row.data) {
-      const cloud = row.data;
-      if (cloud.dailyLogs && cloud.dailyLogs.length > demos.dailyLogs.length) demos.dailyLogs = cloud.dailyLogs;
-      if (cloud.prospects) {
-        const localMap = new Map(demos.prospects.map(p => [p.id, p]));
-        cloud.prospects.forEach(cp => {
-          if (!localMap.has(cp.id)) demos.prospects.push(cp);
-          else if (cp.updatedAt > (localMap.get(cp.id).updatedAt || 0)) localMap.set(cp.id, cp);
-        });
-        demos.prospects = [...localMap.values()];
-      }
-      demos.nextPId = Math.max(demos.nextPId, cloud.nextPId || 1);
-      saveDemos();
-    } else if (error && error.code === 'PGRST116') {
-      await sb.from('planner').insert({ id: 'demos', data: demos });
-    }
-  } catch(e) {}
+  // Already loaded in loadDemos — this is a no-op now
+  // Kept for compatibility
 }
 
 async function cloudSaveDemos() {
