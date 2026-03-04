@@ -1387,7 +1387,7 @@ if (crm.leads.length === 0) {
 }
 
 // ===== 100 DEMOS TRACKER =====
-const DEMOS_STORE = 'dp_demos_v2';
+const DEMOS_STORE = 'dp_demos_v3';
 const SPRINT_START = '2026-03-04';
 const SPRINT_END = '2026-06-02';
 const SPRINT_TARGET = 100;
@@ -1641,16 +1641,20 @@ function renderDemos() {
           <span class="pc-vertical">${esc(p.vertical||'')}</span>
           <span class="pc-status ${p.status}">${statusLabel[p.status]||p.status}</span>
         </div>
-        ${p.phone ? `<div style="width:100%;display:flex;align-items:center;gap:6px">
+        ${p.role ? `<div style="width:100%;font-size:11px;color:var(--text-dim)">🎯 ${esc(p.role)}</div>` : ''}
+        ${p.phone ? `<div style="width:100%;display:flex;align-items:center;gap:8px">
           <a href="tel:+65${p.phone.replace(/\s/g,'')}" style="font-size:13px;font-weight:700;color:var(--accent);text-decoration:none">📞 +65 ${esc(p.phone)}</a>
-          ${p.role ? `<span style="font-size:11px;color:var(--text-dim)">→ ${esc(p.role)}</span>` : ''}
-        </div>` : (p.role ? `<div style="width:100%;font-size:11px;color:var(--text-dim)">🎯 ${esc(p.role)}</div>` : '')}
+        </div>` : ''}
+        ${p.email ? `<div style="width:100%">
+          <a href="mailto:${esc(p.email)}" style="font-size:12px;color:var(--text-mid);text-decoration:none">✉️ ${esc(p.email)}</a>
+        </div>` : ''}
         ${p.contact ? `<div style="width:100%;font-size:11px;color:var(--text-dim)">👤 ${esc(p.contact)}</div>` : ''}
         ${p.notes ? `<div style="width:100%;font-size:11px;color:var(--text-faint);line-height:1.4">${esc(p.notes)}</div>` : ''}
         <div class="pc-actions" style="width:100%">
           <button class="pc-btn" onclick="editProspect(${p.id})">Edit</button>
           <button class="pc-btn" onclick="quickStatusChange(${p.id})">→ Next</button>
           ${p.phone ? `<a class="pc-btn" href="tel:+65${p.phone.replace(/\s/g,'')}" style="text-decoration:none;text-align:center;color:var(--accent);border-color:var(--accent)">📞 Call</a>` : ''}
+          ${p.email ? `<a class="pc-btn" href="mailto:${esc(p.email)}" style="text-decoration:none;text-align:center">✉️ Email</a>` : ''}
         </div>
       </div>`;
     });
