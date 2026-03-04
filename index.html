@@ -294,6 +294,7 @@
   .pc-status.contacted { background: rgba(196,107,46,0.1); color: var(--accent); }
   .pc-status.demo-booked { background: rgba(39,174,96,0.1); color: var(--success); }
   .pc-status.demo-done { background: rgba(0,0,0,0.08); color: var(--text); }
+  .pc-status.won { background: rgba(39,174,96,0.15); color: var(--success); font-weight: 700; }
   .pc-status.no-response { background: rgba(192,57,43,0.1); color: var(--danger); }
   .prospect-card .pc-actions { display: flex; gap: 4px; }
   .prospect-card .pc-btn { background: none; border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; color: var(--text-dim); }
@@ -572,6 +573,7 @@
           <option value="contacted">Contacted</option>
           <option value="demo-booked">Demo Booked</option>
           <option value="demo-done">Demo Done</option>
+          <option value="won">Won 💰</option>
           <option value="no-response">No Response</option>
         </select>
       </div>
@@ -1397,9 +1399,18 @@ if (crm.leads.length === 0) {
 // ===== 100 DEMOS TRACKER =====
 const DEMOS_STORE = 'dp_demos_v4';
 const SPRINT_START = '2026-03-04';
-const SPRINT_END = '2026-06-02';
-const SPRINT_TARGET = 100;
-const WEEKLY_TARGET = 8;
+const SPRINT_END = '2026-06-30';
+const SPRINT_TARGET = 29;
+const WEEKLY_TARGET = 2;
+const REVENUE_TARGET = 50000;
+const SMB_PRICE = 599;
+const ENT_PRICE = 2000;
+const MONTHLY_TARGETS = [
+  { month: '2026-03', label: 'Mar', newSmb: 5, newEnt: 2, cumRevenue: 6995 },
+  { month: '2026-04', label: 'Apr', newSmb: 8, newEnt: 2, cumRevenue: 21785 },
+  { month: '2026-05', label: 'May', newSmb: 6, newEnt: 1, cumRevenue: 38569 },
+  { month: '2026-06', label: 'Jun', newSmb: 4, newEnt: 1, cumRevenue: 57347 },
+];
 
 let demos = { dailyLogs: [], prospects: [], nextPId: 1 };
 let editingProspectId = null;
@@ -1465,7 +1476,7 @@ async function cloudSaveDemos() {
 }
 
 function updateDemosBadge() {
-  const total = demos.prospects.filter(p => p.status === 'demo-done').length;
+  const total = demos.prospects.filter(p => p.status === 'won').length;
   ['demos-count', 'm-demos-count'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.textContent = total + '/' + SPRINT_TARGET; el.style.display = ''; }
@@ -1499,7 +1510,7 @@ function renderDemos() {
   const currentWeek = getSprintWeek(today);
 
   // Aggregate stats
-  const totalDemos = demos.prospects.filter(p => p.status === 'demo-done').length;
+  const totalDemos = demos.prospects.filter(p => p.status === 'demo-done' || p.status === 'won').length;
   const demosBooked = demos.prospects.filter(p => p.status === 'demo-booked').length;
   const totalOutreach = demos.dailyLogs.reduce((s,l) => s + (l.linkedin||0) + (l.emails||0) + (l.calls||0), 0);
   const totalReplies = demos.dailyLogs.reduce((s,l) => s + (l.replies||0), 0);
@@ -1509,32 +1520,101 @@ function renderDemos() {
   const daysTotal = Math.floor((new Date(SPRINT_END) - new Date(SPRINT_START)) / (1000*60*60*24));
   const paceNeeded = daysElapsed > 0 ? ((SPRINT_TARGET - totalDemos) / Math.max(1, daysTotal - daysElapsed) * 7).toFixed(1) : WEEKLY_TARGET;
 
+  // Revenue calculation
+  const wonProspects = demos.prospects.filter(p => p.status === 'won');
+  const wonSmb = wonProspects.filter(p => p.segment === 'smb');
+  const wonEnt = wonProspects.filter(p => !p.segment || p.segment !== 'smb');
+  // Calculate cumulative revenue: each won client pays monthly from wonDate to today
+  let totalRevenue = 0;
+  const endDate = new Date('2026-06-30');
+  wonProspects.forEach(p => {
+    const price = p.segment === 'smb' ? SMB_PRICE : ENT_PRICE;
+    const startMonth = new Date(p.wonDate || today);
+    let months = 0;
+    const cursor = new Date(startMonth.getFullYear(), startMonth.getMonth(), 1);
+    const cap = endDate < new Date(today) ? endDate : new Date(today);
+    while (cursor <= cap) { months++; cursor.setMonth(cursor.getMonth() + 1); }
+    totalRevenue += price * Math.max(1, months);
+  });
+  // Project to June
+  let projectedRevenue = 0;
+  wonProspects.forEach(p => {
+    const price = p.segment === 'smb' ? SMB_PRICE : ENT_PRICE;
+    const startMonth = new Date(p.wonDate || today);
+    let months = 0;
+    const cursor = new Date(startMonth.getFullYear(), startMonth.getMonth(), 1);
+    while (cursor <= endDate) { months++; cursor.setMonth(cursor.getMonth() + 1); }
+    projectedRevenue += price * Math.max(1, months);
+  });
+  const currentMRR = wonSmb.length * SMB_PRICE + wonEnt.length * ENT_PRICE;
+
   let html = '';
+
+  // Revenue banner
+  const revPct = Math.min(100, Math.round(totalRevenue / REVENUE_TARGET * 100));
+  html += `<div style="background:linear-gradient(135deg,#1a1a1a,#2c2c2c);border-radius:12px;padding:16px;margin-bottom:16px;color:#fff">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+      <span style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#aaa">Revenue → $50K by June</span>
+      <span style="font-size:11px;color:${revPct >= 25 ? '#27ae60' : '#c46b2e'}">${revPct}%</span>
+    </div>
+    <div style="font-size:28px;font-weight:800;color:var(--accent);letter-spacing:-1px">$${totalRevenue.toLocaleString()}</div>
+    <div style="font-size:11px;color:#888;margin-top:2px">collected · MRR $${currentMRR.toLocaleString()} · projected $${projectedRevenue.toLocaleString()} by Jun</div>
+    <div style="background:#333;border-radius:4px;height:6px;margin-top:10px;overflow:hidden">
+      <div style="background:var(--accent);height:100%;width:${revPct}%;border-radius:4px;transition:width 0.5s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#888">
+      <span>💰 ${wonSmb.length} SMB × $${SMB_PRICE} + ${wonEnt.length} ENT × $${ENT_PRICE.toLocaleString()}</span>
+      <span>${wonProspects.length}/${SPRINT_TARGET} deals</span>
+    </div>
+  </div>`;
 
   // Sprint stats
   html += `<div class="sprint-header">
-    <div class="sprint-stat"><div class="sprint-stat-label">Demos Done</div>
-      <div class="sprint-stat-value accent">${totalDemos}</div>
+    <div class="sprint-stat"><div class="sprint-stat-label">Deals Won</div>
+      <div class="sprint-stat-value accent">${wonProspects.length}</div>
       <div class="sprint-stat-sub">of ${SPRINT_TARGET} target</div></div>
-    <div class="sprint-stat"><div class="sprint-stat-label">Booked</div>
-      <div class="sprint-stat-value">${demosBooked}</div>
-      <div class="sprint-stat-sub">upcoming demos</div></div>
+    <div class="sprint-stat"><div class="sprint-stat-label">Demos</div>
+      <div class="sprint-stat-value">${totalDemos}</div>
+      <div class="sprint-stat-sub">${demosBooked} booked</div></div>
     <div class="sprint-stat"><div class="sprint-stat-label">Outreach</div>
       <div class="sprint-stat-value">${totalOutreach}</div>
-      <div class="sprint-stat-sub">${totalReplies} replies (${totalOutreach > 0 ? Math.round(totalReplies/totalOutreach*100) : 0}%)</div></div>
-    <div class="sprint-stat"><div class="sprint-stat-label">Week ${currentWeek + 1}/13</div>
+      <div class="sprint-stat-sub">${totalReplies} replies</div></div>
+    <div class="sprint-stat"><div class="sprint-stat-label">Week ${currentWeek + 1}/17</div>
       <div class="sprint-stat-value">${paceNeeded}</div>
-      <div class="sprint-stat-sub">demos/week needed</div></div>
+      <div class="sprint-stat-sub">deals/wk needed</div></div>
     <div class="sprint-stat"><div class="sprint-stat-label">Prospects</div>
       <div class="sprint-stat-value">${demos.prospects.length}</div>
       <div class="sprint-stat-sub">${contacted} contacted</div></div>
   </div>`;
 
+  // Monthly targets
+  const currentMonth = today.slice(0,7);
+  html += `<div style="margin-bottom:16px">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:8px">Monthly Targets</h3>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+    ${MONTHLY_TARGETS.map(mt => {
+      const mWon = wonProspects.filter(p => (p.wonDate||'').startsWith(mt.month));
+      const mSmb = mWon.filter(p => p.segment === 'smb').length;
+      const mEnt = mWon.filter(p => !p.segment || p.segment !== 'smb').length;
+      const isCur = mt.month === currentMonth;
+      const isPast = mt.month < currentMonth;
+      const smbOk = mSmb >= mt.newSmb;
+      const entOk = mEnt >= mt.newEnt;
+      return `<div style="background:${isCur ? '#fdf6f0' : 'var(--surface)'};border-radius:8px;padding:10px;border:${isCur ? '1.5px solid var(--accent)' : '1px solid var(--border)'}">
+        <div style="font-weight:700;font-size:13px;margin-bottom:4px">${mt.label} ${isCur ? '← now' : ''}</div>
+        <div style="font-size:11px;color:${smbOk ? 'var(--success)' : 'var(--text-dim)'}">🏪 SMB: ${mSmb}/${mt.newSmb}</div>
+        <div style="font-size:11px;color:${entOk ? 'var(--success)' : 'var(--text-dim)'}">🏢 ENT: ${mEnt}/${mt.newEnt}</div>
+        <div style="font-size:10px;color:var(--text-faint);margin-top:4px">cum: $${mt.cumRevenue.toLocaleString()}</div>
+      </div>`;
+    }).join('')}
+    </div>
+  </div>`;
+
   // Progress bar
-  const pct = Math.min(100, Math.round(totalDemos / SPRINT_TARGET * 100));
+  const pct = Math.min(100, Math.round(wonProspects.length / SPRINT_TARGET * 100));
   const expectedPct = Math.min(100, Math.round(daysElapsed / daysTotal * 100));
   html += `<div class="progress-section">
-    <div class="progress-label"><span>Progress</span><span>${totalDemos}/${SPRINT_TARGET} demos (${pct}%)</span></div>
+    <div class="progress-label"><span>Deals Progress</span><span>${wonProspects.length}/${SPRINT_TARGET} deals (${pct}%)</span></div>
     <div class="progress-bar-outer">
       <div class="progress-bar-inner" style="width:${pct}%;background:${pct >= expectedPct ? 'var(--success)' : 'var(--accent)'}"></div>
       <div class="progress-bar-text">${pct >= expectedPct ? '✅ On track' : '⚠️ Behind pace'}</div>
@@ -1549,15 +1629,14 @@ function renderDemos() {
       <div class="funnel-bar f-outreach" style="height:${Math.max(8, totalOutreach/maxF*100)}%"><span class="fb-value">${totalOutreach}</span><span class="fb-label">Outreach</span></div>
       <div class="funnel-bar f-replied" style="height:${Math.max(8, totalReplies/maxF*100)}%"><span class="fb-value">${totalReplies}</span><span class="fb-label">Replies</span></div>
       <div class="funnel-bar f-demos" style="height:${Math.max(8, (totalDemos+demosBooked)/maxF*100)}%"><span class="fb-value">${totalDemos + demosBooked}</span><span class="fb-label">Demos</span></div>
-      <div class="funnel-bar f-proposals" style="height:${Math.max(8, 0)}%"><span class="fb-value">—</span><span class="fb-label">Proposals</span></div>
-      <div class="funnel-bar f-won" style="height:${Math.max(8, 0)}%"><span class="fb-value">—</span><span class="fb-label">Won</span></div>
+      <div class="funnel-bar f-won" style="height:${Math.max(8, wonProspects.length/maxF*100)}%;background:var(--success)"><span class="fb-value">${wonProspects.length}</span><span class="fb-label">Won</span></div>
     </div>
   </div>`;
 
   // Weekly grid
   html += `<div style="margin-bottom:8px"><h3 style="font-size:14px;font-weight:700">Weekly Breakdown</h3></div>
     <div class="week-grid">`;
-  for (let w = 0; w < 13; w++) {
+  for (let w = 0; w < 17; w++) {
     const wd = getWeekDates(w);
     const weekDemos = demos.prospects.filter(p => p.status === 'demo-done' && p.demoDate && p.demoDate >= wd.start && p.demoDate <= wd.end).length;
     const weekOutreach = demos.dailyLogs.filter(l => l.date >= wd.start && l.date <= wd.end).reduce((s,l) => s + (l.linkedin||0) + (l.emails||0) + (l.calls||0), 0);
@@ -1634,6 +1713,7 @@ function renderDemos() {
       <span class="prospect-filter${demosStatusFilter==='contacted'?' active':''}" onclick="filterProspects('contacted','status')">Contacted</span>
       <span class="prospect-filter${demosStatusFilter==='demo-booked'?' active':''}" onclick="filterProspects('demo-booked','status')">Demo Booked</span>
       <span class="prospect-filter${demosStatusFilter==='demo-done'?' active':''}" onclick="filterProspects('demo-done','status')">Demo Done</span>
+      <span class="prospect-filter${demosStatusFilter==='won'?' active':''}" onclick="filterProspects('won','status')">Won 💰</span>
       <span class="prospect-filter${demosStatusFilter==='no-response'?' active':''}" onclick="filterProspects('no-response','status')">No Response</span>
     </div>
     <div class="prospect-list">`;
@@ -1644,7 +1724,7 @@ function renderDemos() {
   if (demosVerticalFilter !== 'all') filtered = filtered.filter(p => p.vertical === demosVerticalFilter);
   if (demosStatusFilter !== 'all') filtered = filtered.filter(p => p.status === demosStatusFilter);
   filtered.sort((a,b) => {
-    const order = { 'demo-booked': 0, 'contacted': 1, 'not-started': 2, 'no-response': 3, 'demo-done': 4 };
+    const order = { 'won': 0, 'demo-booked': 1, 'contacted': 2, 'not-started': 3, 'no-response': 4, 'demo-done': 5 };
     return (order[a.status]||9) - (order[b.status]||9);
   });
 
@@ -1652,7 +1732,7 @@ function renderDemos() {
     html += '<div style="font-size:12px;color:var(--text-faint);padding:16px 0;text-align:center">No prospects yet. Click "+ Add Prospect" to start building your list.</div>';
   } else {
     filtered.forEach(p => {
-      const statusLabel = { 'not-started':'Not Started', 'contacted':'Contacted', 'demo-booked':'Demo Booked', 'demo-done':'Demo Done ✅', 'no-response':'No Response' };
+      const statusLabel = { 'not-started':'Not Started', 'contacted':'Contacted', 'demo-booked':'Demo Booked', 'demo-done':'Demo Done ✅', 'won':'Won 💰', 'no-response':'No Response' };
       html += `<div class="prospect-card" style="flex-wrap:wrap;gap:6px">
         <div class="pc-left" style="width:100%;flex:none">
           <span class="pc-company">${esc(p.company)}</span>
@@ -1794,14 +1874,15 @@ function closeProspectModal() {
 function quickStatusChange(id) {
   const p = demos.prospects.find(x => x.id === id);
   if (!p) return;
-  const flow = ['not-started', 'contacted', 'demo-booked', 'demo-done'];
+  const flow = ['not-started', 'contacted', 'demo-booked', 'demo-done', 'won'];
   const idx = flow.indexOf(p.status);
   if (idx < flow.length - 1) {
     p.status = flow[idx + 1];
     if (p.status === 'demo-done' && !p.demoDate) p.demoDate = new Date().toISOString().slice(0,10);
+    if (p.status === 'won' && !p.wonDate) p.wonDate = new Date().toISOString().slice(0,10);
     p.updatedAt = Date.now();
     saveDemos(); renderDemos();
-    const labels = { 'contacted':'Contacted', 'demo-booked':'Demo Booked', 'demo-done':'Demo Done! 🎉' };
+    const labels = { 'contacted':'Contacted', 'demo-booked':'Demo Booked', 'demo-done':'Demo Done! 🎉', 'won':'Won! 💰🎉' };
     toast(labels[p.status] || p.status);
   }
 }
